@@ -1,4 +1,4 @@
-<!-- Chosen Palette: Sable Parchment -->
+<!-- Chosen Palette: Spire Twilight -->
 <!-- Application Structure Plan: A dashboard-style SPA. A sticky sidebar allows instant navigation between adventure 'beats' displayed in the main content area. Critical information like adversary stat blocks and loot details are displayed in modals, triggered by clicking on their names within the text. This non-linear structure is chosen to support a GM's workflow, allowing quick access to reference material without losing their place in the narrative flow, which is superior to a linear document for at-the-table use. -->
 <!-- Visualization & Content Choices: Narrative beats are presented as scrollable cards (Goal: Guide). GM notes are in collapsible accordions to reduce clutter (Goal: Inform). Adversary stats are shown in modals with a Chart.js HP donut chart for quick visual assessment (Goal: Compare/Inform). Loot is in a centralized modal for easy reference (Goal: Organize). A simple HTML/CSS flowchart visualizes the clue progression (Goal: Organize). This avoids SVG/Mermaid and prioritizes interactive, on-demand information delivery. -->
 <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
@@ -13,11 +13,27 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'spire-deep-blue': '#2c3e50',
+                        'spire-dusk-orange': '#d35400',
+                        'spire-magic-violet': '#8e44ad',
+                        'spire-parchment': '#fdfbf5',
+                        'spire-dark-text': '#34495e',
+                        'spire-light-text': '#7f8c8d',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         body {
             font-family: 'Lato', sans-serif;
-            background-color: #FDFBF5;
-            color: #403a35;
+            background-color: var(--spire-parchment, #FDFBF5);
+            color: var(--spire-dark-text, #34495e);
         }
         h1, h2, h3, h4, .font-title {
             font-family: 'IM Fell English', serif;
@@ -25,19 +41,19 @@
         .read-aloud {
             font-family: 'IM Fell English', serif;
             font-style: italic;
-            border-left: 3px solid #c59d5f;
+            border-left: 3px solid var(--spire-dusk-orange, #d35400);
             background-color: #fcf8f0;
         }
         .gm-note-box {
-             background-color: #f7f2e9;
+             background-color: #f8f5f0;
              border: 1px solid #e0d9cd;
         }
         .sidebar-link.active {
-            background-color: #c59d5f;
+            background-color: var(--spire-dusk-orange, #d35400);
             color: #ffffff;
         }
         .modal-backdrop {
-            background-color: rgba(0,0,0,0.6);
+            background-color: rgba(0,0,0,0.7);
         }
         .chart-container {
             position: relative;
@@ -50,23 +66,23 @@
         }
     </style>
 </head>
-<body class="antialiased">
+<body class="antialiased bg-spire-parchment text-spire-dark-text">
 
     <!-- Header -->
-    <header class="bg-stone-800 text-white p-4 shadow-lg sticky top-0 z-20">
+    <header class="bg-spire-deep-blue text-white p-4 shadow-lg sticky top-0 z-20">
         <div class="container mx-auto flex justify-between items-center">
             <h1 class="text-2xl md:text-3xl font-title">The Flickering Spire</h1>
             <div class="flex items-center space-x-2 md:space-x-4">
-                <button onclick="openModal('overviewModal')" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded-lg text-sm md:text-base transition-colors duration-200">Overview</button>
-                <button onclick="openModal('rewardsModal')" class="bg-sky-700 hover:bg-sky-800 text-white font-bold py-2 px-4 rounded-lg text-sm md:text-base transition-colors duration-200">Rewards</button>
+                <button onclick="openModal('overviewModal')" class="bg-spire-dusk-orange hover:bg-opacity-80 text-white font-bold py-2 px-4 rounded-lg text-sm md:text-base transition-colors duration-200">Overview</button>
+                <button onclick="openModal('rewardsModal')" class="bg-spire-magic-violet hover:bg-opacity-80 text-white font-bold py-2 px-4 rounded-lg text-sm md:text-base transition-colors duration-200">Rewards</button>
             </div>
         </div>
     </header>
 
     <div class="flex">
         <!-- Sidebar Navigation -->
-        <aside id="sidebar" class="w-1/5 bg-stone-100 p-4 sticky top-[80px] h-[calc(100vh-80px)] overflow-y-auto hidden md:block">
-            <h2 class="font-title text-xl text-stone-700 mb-4 border-b-2 border-stone-300 pb-2">Adventure Beats</h2>
+        <aside id="sidebar" class="w-1/5 bg-stone-100 p-4 sticky top-[80px] h-[calc(100vh-80px)] overflow-y-auto hidden md:block border-r border-stone-200">
+            <h2 class="font-title text-xl text-spire-deep-blue mb-4 border-b-2 border-stone-300 pb-2">Adventure Beats</h2>
             <nav>
                 <ul id="sidebar-nav-list" class="space-y-2">
                     <!-- Nav items will be injected here by JS -->
@@ -76,6 +92,9 @@
 
         <!-- Main Content -->
         <main class="w-full md:w-4/5 p-6 md:p-8 lg:p-12">
+            <div class="mb-8 rounded-lg overflow-hidden shadow-xl">
+                 <img src="https://i.ibb.co/6P26sS8/The-Flickering-Spire.jpg" alt="The Flickering Spire promotional art with a corrupted Spirekeeper atop a tower." class="w-full h-auto">
+            </div>
             <div id="adventure-content" class="space-y-12">
                 <!-- Adventure beats will be injected here by JS -->
             </div>
@@ -85,28 +104,28 @@
     <!-- Modals -->
     <!-- Overview Modal -->
     <div id="overviewModal" class="fixed inset-0 z-30 modal-backdrop items-center justify-center p-4 hidden">
-        <div class="bg-amber-50 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8 relative" onclick="event.stopPropagation()">
-            <button onclick="closeModal('overviewModal')" class="absolute top-4 right-4 text-stone-600 hover:text-stone-900 text-2xl font-bold">&times;</button>
-            <h2 class="font-title text-4xl text-stone-800 mb-6 border-b-2 border-amber-200 pb-3">Adventure Overview</h2>
-            <div id="overview-content" class="space-y-6 text-stone-700">
+        <div class="bg-spire-parchment rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8 relative" onclick="event.stopPropagation()">
+            <button onclick="closeModal('overviewModal')" class="absolute top-4 right-4 text-spire-light-text hover:text-spire-dark-text text-2xl font-bold">&times;</button>
+            <h2 class="font-title text-4xl text-spire-deep-blue mb-6 border-b-2 border-spire-dusk-orange pb-3">Adventure Overview</h2>
+            <div id="overview-content" class="space-y-6 text-spire-dark-text">
                 <div class="gm-note-box p-4 rounded-lg">
-                    <h3 class="font-title text-2xl text-stone-800 mb-2">Introduction</h3>
+                    <h3 class="font-title text-2xl text-spire-deep-blue mb-2">Introduction</h3>
                     <p class="mb-4">This adventure is a one-shot for Daggerheart, designed for five Tier 2, Level 2 characters and takes approximately 4–5 hours to complete. It begins with the Arcanist Astra tasking the party with a final, urgent request concerning a weakening Spire in the Sablewood.</p>
-                    <div class="read-aloud p-3 rounded-md text-stone-800">
+                    <div class="read-aloud p-3 rounded-md">
                         <p>“There’s a Spire, just west of here, maybe a few hours walk. I felt it on the way to the ritual. Its power was... strange. The light felt weaker than it should be. I think something might be terribly wrong with the Spirekeeper, and I fear what will happen if its fire is extinguished altogether... It’s good to have heroes in the Sablewood again.”</p>
                     </div>
                 </div>
                 <div class="gm-note-box p-4 rounded-lg">
-                     <h3 class="font-title text-2xl text-stone-800 mb-2">Clue Progression</h3>
+                     <h3 class="font-title text-2xl text-spire-deep-blue mb-2">Clue Progression</h3>
                      <div class="flex flex-col space-y-2">
                         <div class="bg-white p-3 rounded-md shadow-sm"><strong>Flex Clue:</strong> Traders or tracks hint at something wrong near the Spire.</div>
-                        <div class="text-center text-stone-500">↓</div>
+                        <div class="text-center text-spire-light-text">↓</div>
                         <div class="bg-white p-3 rounded-md shadow-sm"><strong>Core Clue:</strong> The Spirekeeper, Elara, attempted a "new warding ritual" and vanished.</div>
-                        <div class="text-center text-stone-500">↓</div>
+                        <div class="text-center text-spire-light-text">↓</div>
                         <div class="bg-white p-3 rounded-md shadow-sm"><strong>Core Clue:</strong> A wardstone inscription warns: "Only a balanced heart can hold the flame."</div>
-                         <div class="text-center text-stone-500">↓</div>
+                         <div class="text-center text-spire-light-text">↓</div>
                         <div class="bg-white p-3 rounded-md shadow-sm"><strong>Core Clue:</strong> Elara's journal reveals she tried to attune to a "great surge" of magic.</div>
-                        <div class="text-center text-stone-500">↓</div>
+                        <div class="text-center text-spire-light-text">↓</div>
                          <div class="bg-white p-3 rounded-md shadow-sm"><strong>The Truth:</strong> Astra's own keystone ritual inadvertently caused the surge that corrupted Elara.</div>
                      </div>
                 </div>
@@ -116,9 +135,9 @@
     
     <!-- Rewards Modal -->
     <div id="rewardsModal" class="fixed inset-0 z-30 modal-backdrop items-center justify-center p-4 hidden">
-        <div class="bg-amber-50 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8 relative" onclick="event.stopPropagation()">
-            <button onclick="closeModal('rewardsModal')" class="absolute top-4 right-4 text-stone-600 hover:text-stone-900 text-2xl font-bold">&times;</button>
-            <h2 class="font-title text-4xl text-stone-800 mb-6 border-b-2 border-amber-200 pb-3">Rewards & Loot</h2>
+        <div class="bg-spire-parchment rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8 relative" onclick="event.stopPropagation()">
+            <button onclick="closeModal('rewardsModal')" class="absolute top-4 right-4 text-spire-light-text hover:text-spire-dark-text text-2xl font-bold">&times;</button>
+            <h2 class="font-title text-4xl text-spire-deep-blue mb-6 border-b-2 border-spire-dusk-orange pb-3">Rewards & Loot</h2>
             <div id="rewards-content" class="space-y-4">
                 <!-- Rewards will be injected here -->
             </div>
@@ -128,7 +147,7 @@
     <!-- Adversary Modal -->
     <div id="adversaryModal" class="fixed inset-0 z-40 modal-backdrop items-center justify-center p-4 hidden">
         <div class="bg-stone-50 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8 relative" onclick="event.stopPropagation()">
-            <button onclick="closeModal('adversaryModal')" class="absolute top-4 right-4 text-stone-600 hover:text-stone-900 text-2xl font-bold">&times;</button>
+            <button onclick="closeModal('adversaryModal')" class="absolute top-4 right-4 text-spire-light-text hover:text-spire-dark-text text-2xl font-bold">&times;</button>
             <div id="adversary-content">
                 <!-- Adversary details will be injected here -->
             </div>
@@ -155,7 +174,7 @@
                                 <strong>On perils in the west:</strong> "The paths are well-worn... You'll pass near the Miremist hollow, a place known for its perpetual, disorienting fog... Strixwolves hunt in packs, and I've heard tales of Mountain Crabs camouflaged so well they're mistaken for rockfall..." An <strong>Instinct (Sense) check (DC 12)</strong> gets her to admit hybrid fauna are growing more aggressive.
                             </li>
                             <li>
-                                <strong>On points of interest:</strong> "My map marks a small hamlet, Grey-Elm... there's also an old circle of standing stones near the Miremist." A <strong>Presence (Persuade) check (DC 13)</strong> gets her to mention the Galapa trader, <button class="text-sky-700 hover:underline font-bold" onclick="showAdversary('willScild')">Will Scild</button>. "He values his wood wage more than gold... don't touch the small stone he's always tossing."
+                                <strong>On points of interest:</strong> "My map marks a small hamlet, Grey-Elm... there's also an old circle of standing stones near the Miremist." A <strong>Presence (Persuade) check (DC 13)</strong> gets her to mention the Galapa trader, <button class="text-spire-magic-violet hover:underline font-bold" onclick="showAdversary('willScild')">Will Scild</button>. "He values his wood wage more than gold... don't touch the small stone he's always tossing."
                             </li>
                         </ul>`
                     },
@@ -174,12 +193,12 @@
                     {
                         title: "Option 1: The Trade Route (Social)",
                         content: `<p class="read-aloud p-3 my-2 rounded-md">The path is quiet, the silence broken only by the creak of distant cart wheels. Ahead, you spot a lone figure beside a small, sturdy cart pulled by a pair of stout horse-goats. He is a Galapa of indeterminate age, slowly polishing a small, smooth stone he tosses between his hands.</p>
-                        <p>Engage with <button class="text-sky-700 hover:underline font-bold" onclick="showAdversary('willScild')">Will Scild</button>. He provides a <strong>(Flex Clue)</strong>: the lights in Grey-Elm are flickering nervously. A successful <strong>Presence (Connect) check (DC 12)</strong> gets him to add that the Strixwolf howls sound more pained than hungry. The GM can spend a Fear to use Will's <strong>Merchant +2</strong> Experience to increase the Difficulty if the party is being pushy.</p>`
+                        <p>Engage with <button class="text-spire-magic-violet hover:underline font-bold" onclick="showAdversary('willScild')">Will Scild</button>. He provides a <strong>(Flex Clue)</strong>: the lights in Grey-Elm are flickering nervously. A successful <strong>Presence (Connect) check (DC 12)</strong> gets him to add that the Strixwolf howls sound more pained than hungry. The GM can spend a Fear to use Will's <strong>Merchant +2</strong> Experience to increase the Difficulty if the party is being pushy.</p>`
                     },
                     {
                         title: "Option 2: The Animal Trail (Combat)",
                         content: `<p class="read-aloud p-3 my-2 rounded-md">The muddy trail opens into a clearing filled with stagnant, knee-deep pools of water shrouded in thin wisps of fog. The air is heavy with the smell of wet decay... Suddenly, the water erupts as a massive, bull-sized amphibian with mottled, ashen skin and wickedly sharp horns launches itself from a pool.</p>
-                        <p>This is an ambush by a <button class="text-sky-700 hover:underline font-bold" onclick="showAdversary('bullfrog')">Corrupted Bullfrog Juggernaut</button>. The area is difficult terrain. After combat, the party finds the <strong>(Flex Clue)</strong>: Strixwolf tracks with flecks of warped stone.</p>`
+                        <p>This is an ambush by a <button class="text-spire-magic-violet hover:underline font-bold" onclick="showAdversary('bullfrog')">Corrupted Bullfrog Juggernaut</button>. The area is difficult terrain. After combat, the party finds the <strong>(Flex Clue)</strong>: Strixwolf tracks with flecks of warped stone.</p>`
                     }
                 ]
             },
@@ -191,7 +210,7 @@
                 gmNotes: [
                     {
                         title: "Countdown: Hamlet's Paranoia",
-                        content: "Begin a <strong>Consequence Countdown (4)</strong>. It ticks down on failed social rolls, rolls with Fear, or aggressive magic. When it triggers, Jorn and 3 <button class='text-sky-700 hover:underline font-bold' onclick='showAdversary(`blightedVillager`)'>Blighted Villagers</button> attack."
+                        content: "Begin a <strong>Consequence Countdown (4)</strong>. It ticks down on failed social rolls, rolls with Fear, or aggressive magic. When it triggers, Jorn and 3 <button class='text-spire-magic-violet hover:underline font-bold' onclick='showAdversary(`blightedVillager`)'>Blighted Villagers</button> attack."
                     },
                     {
                         title: "Finding the Core Clue",
@@ -211,7 +230,7 @@
                 gmNotes: [
                     {
                         title: "The Puzzle & Getting Lost",
-                        content: "Align five wardstones with constellations, requiring **Knowledge (Recall)** or **Instinct (Study) checks (DC 12)**. Failure begins a **Static Countdown (3): 'Lost in the Mire.'** At 3 ticks, an <button class='text-sky-700 hover:underline font-bold' onclick='showAdversary(`eeligator`)'>Eeligator Lurker</button> ambushes the party."
+                        content: "Align five wardstones with constellations, requiring **Knowledge (Recall)** or **Instinct (Study) checks (DC 12)**. Failure begins a **Static Countdown (3): 'Lost in the Mire.'** At 3 ticks, an <button class='text-spire-magic-violet hover:underline font-bold' onclick='showAdversary(`eeligator`)'>Eeligator Lurker</button> ambushes the party."
                     },
                     {
                         title: "The Ambush",
@@ -227,7 +246,7 @@
                 gmNotes: [
                     {
                         title: "Encounter & Clue",
-                        content: "The party faces 3 <button class='text-sky-700 hover:underline font-bold' onclick='showAdversary(`strixwolf`)'>Corrupted Strixwolves</button>. After the fight, a **Knowledge (Investigate) check (DC 12)** uncovers Elara's journal, mentioning her plan to attune to a 'great surge.'"
+                        content: "The party faces 3 <button class='text-spire-magic-violet hover:underline font-bold' onclick='showAdversary(`strixwolf`)'>Corrupted Strixwolves</button>. After the fight, a **Knowledge (Investigate) check (DC 12)** uncovers Elara's journal, mentioning her plan to attune to a 'great surge.'"
                     },
                     {
                         title: "Escalations",
@@ -259,7 +278,7 @@
                 gmNotes: [
                     {
                         title: "The Final Confrontation",
-                        content: "This is the final battle against <button class='text-sky-700 hover:underline font-bold' onclick='showAdversary(`elara`)'>Elara, the Spirekeeper</button>. The party has two ways to win: defeat her or cleanse the Spire."
+                        content: "This is the final battle against <button class='text-spire-magic-violet hover:underline font-bold' onclick='showAdversary(`elara`)'>Elara, the Spirekeeper</button>. The party has two ways to win: defeat her or cleanse the Spire."
                     },
                     {
                         title: "Dynamic Countdown: Cleanse the Spire",
@@ -384,9 +403,9 @@
 
             contentEl.innerHTML += `
                 <section id="${beat.id}" class="space-y-4 pt-4">
-                    <h2 class="font-title text-3xl text-stone-800 border-b-2 border-amber-300 pb-2">${beat.title}</h2>
-                    <p class="text-stone-600">${beat.setup}</p>
-                    <div class="read-aloud p-4 rounded-md text-stone-800">
+                    <h2 class="font-title text-3xl text-spire-deep-blue border-b-2 border-spire-dusk-orange pb-2">${beat.title}</h2>
+                    <p>${beat.setup}</p>
+                    <div class="read-aloud p-4 rounded-md">
                         <p>${beat.readAloud}</p>
                     </div>
                     <div class="space-y-2">${notesHtml}</div>
@@ -394,23 +413,23 @@
             `;
             
             navEl.innerHTML += `
-                <li><a href="#${beat.id}" class="sidebar-link block py-2 px-4 rounded-md text-stone-700 hover:bg-amber-100 transition-colors duration-200">${beat.title.split(':')[1].trim()}</a></li>
+                <li><a href="#${beat.id}" class="sidebar-link block py-2 px-4 rounded-md hover:bg-stone-200 transition-colors duration-200">${beat.title.split(':')[1].trim()}</a></li>
             `;
         });
         
         adventureData.rewards.forEach(category => {
             let itemsHtml = category.items.map(item => `
                 <div class="bg-white p-4 rounded-lg shadow-sm">
-                    <h4 class="font-title text-xl text-stone-800">${item.name}</h4>
-                    ${item.sub ? `<p class="text-sm text-stone-500 italic mb-2">${item.sub}</p>` : ''}
-                    <p class="text-stone-700">${item.description}</p>
+                    <h4 class="font-title text-xl text-spire-deep-blue">${item.name}</h4>
+                    ${item.sub ? `<p class="text-sm text-spire-light-text italic mb-2">${item.sub}</p>` : ''}
+                    <p>${item.description}</p>
                 </div>
             `).join('');
             
             rewardsEl.innerHTML += `
                 <div>
-                    <h3 class="font-title text-2xl text-stone-800 mb-2">${category.category}</h3>
-                    <div class="space-y-3">${category.description ? `<p class="mb-3 text-stone-600">${category.description}</p>` : ''}${itemsHtml}</div>
+                    <h3 class="font-title text-2xl text-spire-deep-blue mb-2">${category.category}</h3>
+                    <div class="space-y-3">${category.description ? `<p class="mb-3">${category.description}</p>` : ''}${itemsHtml}</div>
                 </div>
             `;
         });
@@ -431,8 +450,8 @@
                 if (stat.toLowerCase() === 'maxhp') return '';
                 return `
                     <div class="text-center">
-                        <p class="text-sm text-stone-500 uppercase font-bold tracking-wider">${stat.replace(/([A-Z])/g, ' $1')}</p>
-                        <p class="text-xl font-bold text-sky-800">${value}</p>
+                        <p class="text-sm text-spire-light-text uppercase font-bold tracking-wider">${stat.replace(/([A-Z])/g, ' $1')}</p>
+                        <p class="text-xl font-bold text-spire-magic-violet">${value}</p>
                     </div>`;
             }).join('');
         }
@@ -441,7 +460,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
                 ${adversary.stats.maxHp ? `
                 <div class="md:col-span-1 flex flex-col items-center">
-                    <h4 class="font-title text-lg mb-2 text-stone-700">Health</h4>
+                    <h4 class="font-title text-lg mb-2">Health</h4>
                     <div class="chart-container">
                         <canvas id="hpChart"></canvas>
                     </div>
@@ -449,8 +468,8 @@
                 ` : '<div class="md:col-span-1"></div>'}
 
                 <div class="md:col-span-2 text-center md:text-left">
-                    <h3 class="font-title text-3xl text-stone-800">${adversary.name}</h3>
-                    <p class="text-stone-500 italic mb-4">${adversary.type}</p>
+                    <h3 class="font-title text-3xl text-spire-deep-blue">${adversary.name}</h3>
+                    <p class="text-spire-light-text italic mb-4">${adversary.type}</p>
                 </div>
             </div>
 
@@ -459,11 +478,11 @@
             </div>
             
             <div class="space-y-4">
-                <div><strong class="font-title text-lg">Motives & Tactics:</strong> <span class="text-stone-600">${adversary.motives}</span></div>
-                <div><strong class="font-title text-lg">Experiences:</strong> <span class="text-stone-600">${adversary.experiences}</span></div>
-                ${adversary.features ? `<div><strong class="font-title text-lg">Features:</strong><ul class="list-disc list-inside text-stone-600">${adversary.features.map(f => `<li>${f}</li>`).join('')}</ul></div>` : ''}
-                ${adversary.actions ? `<div><strong class="font-title text-lg">Actions:</strong><ul class="list-disc list-inside text-stone-600">${adversary.actions.map(a => `<li>${a}</li>`).join('')}</ul></div>` : ''}
-                ${adversary.fearSpends ? `<div><strong class="font-title text-lg">Fear Spends:</strong> <span class="text-stone-600">${adversary.fearSpends}</span></div>` : ''}
+                <div><strong class="font-title text-lg">Motives & Tactics:</strong> <span class="text-spire-dark-text">${adversary.motives}</span></div>
+                <div><strong class="font-title text-lg">Experiences:</strong> <span class="text-spire-dark-text">${adversary.experiences}</span></div>
+                ${adversary.features ? `<div><strong class="font-title text-lg">Features:</strong><ul class="list-disc list-inside">${adversary.features.map(f => `<li>${f}</li>`).join('')}</ul></div>` : ''}
+                ${adversary.actions ? `<div><strong class="font-title text-lg">Actions:</strong><ul class="list-disc list-inside">${adversary.actions.map(a => `<li>${a}</li>`).join('')}</ul></div>` : ''}
+                ${adversary.fearSpends ? `<div><strong class="font-title text-lg">Fear Spends:</strong> <span>${adversary.fearSpends}</span></div>` : ''}
             </div>
         `;
 
@@ -484,8 +503,8 @@
             data: {
                 datasets: [{
                     data: [current, max - current],
-                    backgroundColor: ['#0369a1', '#e5e7eb'],
-                    borderColor: ['#0369a1', '#e5e7eb'],
+                    backgroundColor: ['#8e44ad', '#ecf0f1'],
+                    borderColor: ['#8e44ad', '#ecf0f1'],
                     borderWidth: 1,
                     cutout: '70%'
                 }]
@@ -509,7 +528,7 @@
                     const text = `${current}/${max}`;
                     const textX = Math.round((width - ctx.measureText(text).width) / 2);
                     const textY = height / 2;
-                    ctx.fillStyle = '#0c4a6e';
+                    ctx.fillStyle = '#2c3e50';
                     ctx.fillText(text, textX, textY);
                     ctx.save();
                 }
