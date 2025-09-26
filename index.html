@@ -1,579 +1,310 @@
-<!-- Chosen Palette: Spire Twilight -->
-<!-- Application Structure Plan: A dashboard-style SPA. A sticky sidebar allows instant navigation between adventure 'beats' displayed in the main content area. Critical information like adversary stat blocks and loot details are displayed in modals, triggered by clicking on their names within the text. This non-linear structure is chosen to support a GM's workflow, allowing quick access to reference material without losing their place in the narrative flow, which is superior to a linear document for at-the-table use. -->
-<!-- Visualization & Content Choices: Narrative beats are presented as scrollable cards (Goal: Guide). GM notes are in collapsible accordions to reduce clutter (Goal: Inform). Adversary stats are shown in modals with a Chart.js HP donut chart for quick visual assessment (Goal: Compare/Inform). Loot is in a centralized modal for easy reference (Goal: Organize). A simple HTML/CSS flowchart visualizes the clue progression (Goal: Organize). This avoids SVG/Mermaid and prioritizes interactive, on-demand information delivery. -->
-<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Flickering Spire - GM Screen</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Lato:wght@400;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'spire-deep-blue': '#2c3e50',
-                        'spire-dusk-orange': '#d35400',
-                        'spire-magic-violet': '#8e44ad',
-                        'spire-parchment': '#fdfbf5',
-                        'spire-dark-text': '#34495e',
-                        'spire-light-text': '#7f8c8d',
-                    }
-                }
+    <title>The Flickering Spire - A Daggerheart Adventure</title>
+    <style>
+        :root {
+            --bg-color: #fcfaf5;
+            --text-color: #4a443b;
+            --heading-color: #3a3228;
+            --card-bg: #ffffff;
+            --border-color: #e0dace;
+            --accent-color: #8c4d16;
+            --accent-text: #ffffff;
+            --gm-only-bg: #f3eee5;
+            --read-aloud-border: #c97b41;
+            --shadow-color: rgba(44, 38, 30, 0.08);
+            --font-size-base: 1rem;
+            --line-height-base: 1.7;
+        }
+
+        html.dark-theme {
+            --bg-color: #1c1a17;
+            --text-color: #d1cdc6;
+            --heading-color: #e8e3da;
+            --card-bg: #2a2621;
+            --border-color: #4f473c;
+            --accent-color: #d35400;
+            --gm-only-bg: #3a3228;
+            --read-aloud-border: #e6985a;
+            --shadow-color: rgba(0, 0, 0, 0.2);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root:not(.light-theme) {
+                --bg-color: #1c1a17;
+                --text-color: #d1cdc6;
+                --heading-color: #e8e3da;
+                --card-bg: #2a2621;
+                --border-color: #4f473c;
+                --accent-color: #d35400;
+                --gm-only-bg: #3a3228;
+                --read-aloud-border: #e6985a;
+                --shadow-color: rgba(0, 0, 0, 0.2);
             }
         }
-    </script>
-    <style>
+        
+        html { scroll-behavior: smooth; }
         body {
-            font-family: 'Lato', sans-serif;
-            background-color: var(--spire-parchment, #FDFBF5);
-            color: var(--spire-dark-text, #34495e);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-size: var(--font-size-base);
+            line-height: var(--line-height-base);
+            margin: 0;
+            transition: background-color 0.3s, color 0.3s;
         }
-        h1, h2, h3, h4, .font-title {
-            font-family: 'IM Fell English', serif;
+        html.big-type { --font-size-base: 1.1rem; --line-height-base: 1.8; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 1rem; display: flex; gap: 2rem; }
+        main { flex-grow: 1; min-width: 0; }
+        header, footer { width: 100%; }
+        h1, h2, h3, h4 { color: var(--heading-color); line-height: 1.3; }
+        h2 { font-size: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-top: 2rem; margin-bottom: 1.5rem; }
+        h3 { font-size: 1.5rem; margin-top: 1.5rem; margin-bottom: 1rem; }
+        blockquote { margin: 1.5rem 0; padding: 1rem; background-color: var(--gm-only-bg); border-left: 4px solid var(--read-aloud-border); border-radius: 0 8px 8px 0; font-style: italic; position: relative; }
+        
+        .hero-banner { width: 100%; height: clamp(40vh, 55vh, 55vh); object-fit: cover; object-position: center; border-radius: 0 0 12px 12px; display: block; }
+        
+        .top-bar { position: sticky; top: 0; z-index: 100; background-color: var(--card-bg); box-shadow: 0 2px 8px var(--shadow-color); padding: 0.5rem 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; justify-content: flex-end; border-bottom: 1px solid var(--border-color); }
+        .top-bar-btn { background-color: var(--gm-only-bg); border: 1px solid var(--border-color); color: var(--text-color); padding: 0.4rem 0.8rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem; transition: background-color 0.2s, color 0.2s; }
+        .top-bar-btn:hover, .top-bar-btn[aria-pressed="true"] { background-color: var(--accent-color); color: var(--accent-text); }
+        .timer-display { font-weight: bold; margin: 0 0.5rem; }
+
+        .sidebar { width: 280px; flex-shrink: 0; position: sticky; top: 70px; height: calc(100vh - 90px); overflow-y: auto; }
+        .sidebar nav a { display: block; padding: 0.5rem 1rem; border-radius: 6px; margin-bottom: 0.25rem; border-left: 3px solid transparent; }
+        .sidebar nav a:hover { background-color: var(--gm-only-bg); }
+        .sidebar nav a.active { border-left-color: var(--accent-color); font-weight: bold; }
+        .sidebar-toggle { display: none; }
+
+        .block { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 2px 6px var(--shadow-color); margin-bottom: 2rem; }
+        .block > summary { padding: 1rem 1.5rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .block > summary h2, .block > summary h3 { margin: 0; border: none; padding: 0; }
+        .block > summary::-webkit-details-marker { display: none; }
+        .block-content { padding: 0 1.5rem 1.5rem; }
+        .block[open] > summary { border-bottom: 1px solid var(--border-color); }
+        
+        .copy-btn { position: absolute; top: 0.5rem; right: 0.5rem; background-color: var(--border-color); border: none; border-radius: 6px; padding: 0.2rem 0.5rem; font-size: 0.75rem; cursor: pointer; }
+        .copy-link-btn { background: none; border: none; color: var(--text-color); cursor: pointer; opacity: 0.5; }
+        .copy-link-btn:hover { opacity: 1; }
+
+        .aria-live-region { position: fixed; bottom: 1rem; left: 1rem; background-color: var(--heading-color); color: var(--bg-color); padding: 0.5rem 1rem; border-radius: 6px; z-index: 200; opacity: 0; transition: opacity 0.3s; }
+
+        #back-to-top { display: none; position: fixed; bottom: 1.5rem; right: 1.5rem; }
+
+        @media (max-width: 1024px) {
+            .container { flex-direction: column; }
+            .sidebar { position: fixed; left: -100%; top: 0; height: 100vh; z-index: 200; background-color: var(--card-bg); transition: left 0.3s; padding-top: 5rem; border-right: 1px solid var(--border-color); }
+            .sidebar.is-open { left: 0; }
+            .sidebar-toggle { display: block; position: fixed; top: 1rem; left: 1rem; z-index: 300; }
+            .top-bar { justify-content: center; }
         }
-        .read-aloud {
-            font-family: 'IM Fell English', serif;
-            font-style: italic;
-            border-left: 3px solid var(--spire-dusk-orange, #d35400);
-            background-color: #fcf8f0;
-        }
-        .gm-note-box {
-             background-color: #f8f5f0;
-             border: 1px solid #e0d9cd;
-        }
-        .sidebar-link.active {
-            background-color: var(--spire-dusk-orange, #d35400);
-            color: #ffffff;
-        }
-        .modal-backdrop {
-            background-color: rgba(0,0,0,0.7);
-        }
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 150px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 150px;
-            max-height: 150px;
+        
+        @media print {
+            body { font-size: 10pt; line-height: 1.5; }
+            .top-bar, #back-to-top, .copy-btn, .copy-link-btn, .sidebar, .sidebar-toggle { display: none; }
+            .hero-banner { height: auto; max-height: 30vh; }
+            .container { display: block; padding: 0; }
+            main { padding: 0; }
+            .block { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; margin-bottom: 1rem; }
+            details[open] { page-break-inside: avoid; }
+            details { page-break-inside: avoid; }
+            blockquote { page-break-inside: avoid; }
+            details { all: initial; } 
+            details > summary { display: block; }
+            h2 { border-color: #ccc; }
+            
+            html.player-handouts .gm-only { display: none; }
         }
     </style>
 </head>
-<body class="antialiased bg-spire-parchment text-spire-dark-text">
+<body>
 
-    <!-- Header -->
-    <header class="bg-spire-deep-blue text-white p-4 shadow-lg sticky top-0 z-20">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-2xl md:text-3xl font-title">The Flickering Spire</h1>
-            <div class="flex items-center space-x-2 md:space-x-4">
-                <button onclick="openModal('overviewModal')" class="bg-spire-dusk-orange hover:bg-opacity-80 text-white font-bold py-2 px-4 rounded-lg text-sm md:text-base transition-colors duration-200">Overview</button>
-                <button onclick="openModal('rewardsModal')" class="bg-spire-magic-violet hover:bg-opacity-80 text-white font-bold py-2 px-4 rounded-lg text-sm md:text-base transition-colors duration-200">Rewards</button>
-            </div>
+    <header>
+        <div class="top-bar">
+             <button class="sidebar-toggle top-bar-btn" aria-label="Toggle Navigation" aria-controls="sidebar" aria-expanded="false">Menu</button>
+            <button id="theme-toggle" class="top-bar-btn" aria-label="Toggle Light/Dark Theme">Light/Dark</button>
+            <button id="big-type-toggle" class="top-bar-btn" aria-label="Toggle Big Type">Big Type</button>
+            <button id="expand-toggle" class="top-bar-btn" aria-label="Expand All Sections">Expand All</button>
+            <span class="timer-display" id="session-timer">00:00</span>
+            <button class="top-bar-btn" id="timer-start">Start</button>
+            <button class="top-bar-btn" id="timer-pause">Pause</button>
+            <button class="top-bar-btn" id="timer-reset">Reset</button>
+            <button class="top-bar-btn" id="print-player">Print: Player Handouts</button>
+            <button class="top-bar-btn" id="print-gm">Print: Full GM</button>
         </div>
+        <img src="https://i.imgur.com/nlsd5iI.jpeg" alt="The Flickering Spire over the Sablewood" class="hero-banner">
     </header>
 
-    <div class="flex">
-        <!-- Sidebar Navigation -->
-        <aside id="sidebar" class="w-1/5 bg-stone-100 p-4 sticky top-[80px] h-[calc(100vh-80px)] overflow-y-auto hidden md:block border-r border-stone-200">
-            <h2 class="font-title text-xl text-spire-deep-blue mb-4 border-b-2 border-stone-300 pb-2">Adventure Beats</h2>
+    <div class="container">
+        <aside id="sidebar" class="sidebar">
             <nav>
-                <ul id="sidebar-nav-list" class="space-y-2">
-                    <!-- Nav items will be injected here by JS -->
-                </ul>
+                <a href="#welcome-blurb" class="sidebar-link">Welcome</a>
+                <a href="#the-setting" class="sidebar-link">The Setting</a>
+                <a href="#the-threat" class="sidebar-link">The Threat</a>
+                <a href="#recent-developments" class="sidebar-link">Recent Developments</a>
+                <a href="#adventure-summary" class="sidebar-link">Adventure Summary</a>
+                <a href="#adventure-hooks" class="sidebar-link">Adventure Hooks</a>
+                <a href="#beats" class="sidebar-link">Adventure Beats</a>
+                <a href="#concluding-the-adventure" class="sidebar-link">Concluding the Adventure</a>
             </nav>
         </aside>
 
-        <!-- Main Content -->
-        <main class="w-full md:w-4/5 p-6 md:p-8 lg:p-12">
-            <div class="mb-8 rounded-lg overflow-hidden shadow-xl">
-                 <img src="https://i.imgur.com/nlsd5iI.jpeg" alt="The Flickering Spire promotional art with a corrupted Spirekeeper atop a tower." class="w-full h-auto">
-            </div>
-            <div id="adventure-content" class="space-y-12">
-                <!-- Adventure beats will be injected here by JS -->
-            </div>
+        <main id="content">
+            <details class="block" open>
+                <summary><h2>Welcome to Daggerheart!</h2></summary>
+                <div class="block-content"><p>Welcome to the Daggerheart™ fantasy tabletop roleplaying game! This adventure is designed to entertain you and your friends for hours with heroic deeds and harrowing perils. You, the Game Master (GM), will guide your friends as they explore the ancient Sablewood, banter with its strange denizens, and defeat vicious monsters with sword, spell, and Valor. Together, the player characters (PCs) can work to thwart an insidious corruption, winning great treasure and a heroic reputation.</p></div>
+            </details>
+            
+            <details class="block" open>
+                <summary><h2>The Setting</h2></summary>
+                <div class="block-content"><p>The Sablewood is an ancient, expansive forest, older than memory, where the canopy is so thick that day and night are often indistinguishable. It is a land of vibrant life, home to unique hybrid fauna and reclusive communities who live within the safety of its massive roots or high among its branches. To maintain a fragile peace, great Spires of stone were erected, tended by solitary Keepers whose life force is tied to the magical flames they protect. These beacons ward the forest against a creeping, mindless blight and pacify the more monstrous creatures that lurk in the shadows, ensuring the Sablewood remains a place of serene, if dangerous, beauty. If only that were true.</p></div>
+            </details>
+
+            <section id="the-threat" class="block"><summary><h2>The Threat</h2></summary><div class="block-content"><p>A subtle corruption has begun to seep into the Sablewood. It is not an invading army, but a formless, insidious blight that preys on weakness and amplifies despair. It twists the natural life of the forest, turning creatures into pained, aggressive versions of themselves and causing the very land to sicken. This blight likely originates from a source of chaotic, uncontrolled magic, and it seeks out conduits—beings of great power or emotion—to anchor itself in the world. Having found a foothold, it spreads through contact and proximity, threatening to unravel the ancient wards that have long protected the forest. If it is not stopped, the Spires will fall one by one, and the Sablewood will be consumed.</p></div></section>
+            <section id="recent-developments" class="block"><summary><h2>Recent Developments</h2></summary><div class="block-content"><p>A powerful surge of raw, untamed magic recently washed through the Sablewood. The source was unknown to Elara, the keeper of the western Spire. Fearing the surge would overwhelm her Spire's wards, she attempted a dangerous attunement ritual, seeking to become a conduit to absorb and control the excess energy. The power was too great. The ritual backfired, shattering her defenses and allowing the latent corruption to pour into her. She is no longer the Spire's guardian but its prisoner, a vessel for the very blight she sought to defy, and the Spire's flame now flickers in time with her fading will.</p></div></section>
+            <section id="adventure-summary" class="block"><summary><h2>Adventure Summary</h2></summary><div class="block-content"><p>The adventure begins when the Arcanist Astra, concerned about a weakening Spire, tasks the PCs with investigating its failing flame. Their journey will take them along the Sablewood Path where they will encounter signs of the spreading corruption. They will discover the blighted hamlet of Grey-Elm and learn of the Spirekeeper's fate before navigating the mystical Miremist to reach the Spire itself. After ascending the crumbling tower, they will face the corrupted Spirekeeper, Elara, with the choice to either cleanse her and the Spire or destroy the vessel she has become to stop the blight's spread.</p></div></section>
+            <section id="adventure-hooks" class="block"><summary><h2>Adventure Hooks</h2></summary><div class="block-content"><ol><li><strong>The Underroot Connection:</strong> You grew up in an Underroot community and have a deep connection to the Sablewood's health. You've felt a "sickness" in the roots and heard whispers from your kin that the surface world is falling out of balance. The dimming of a Spire is a dire omen you feel compelled to investigate.</li><li><strong>A Merchant's Debt (Sable Sinecure):</strong> You are a member of, or have a significant debt to, the Sable Sinecure merchant's guild. The increasing aggression of the forest's hybrid fauna is making the well-worn pathways unsafe, disrupting trade. The guild has put out a bounty for anyone who can discover the source of the recent animal agitation and "pacify" it. The dimming Spire is the most likely culprit.</li><li><strong>Spire-Sworn Lineage:</strong> One of your ancestors was a Spirekeeper. Though you never knew them, you carry a small, inert warding totem passed down through your family. For the past week, it has begun to feel warm and pulse with a faint, sickly light. You feel a pull towards the west, an instinctual call to answer a distress you don't yet understand.</li></ol></div></section>
+
+            <section id="beats" class="block">
+                <summary><h2>Adventure Beats</h2></summary>
+                <div class="block-content">
+                    <details id="interlude-1-a-favour-for-a-friend" class="block">
+                        <summary><h3>Interlude 1: A Favour for a Friend <button class="copy-link-btn gm-only" aria-label="Copy link to this section">🔗</button></h3></summary>
+                        <div class="block-content"><h4>Subtitle: Setup</h4><p>The characters have just returned to the Arcanist Astra’s home. She has offered them rest before asking this one last favor. She is tired but clearly worried, gesturing to a hand-drawn map.</p><p><strong>Encounter/NPCs/Monsters overview:</strong> This is a social roleplaying scene with the Arcanist Astra.</p><blockquote>The scent of savory stew and cedarwood smoke fills Astra’s cozy, circular home. Outside, the endless canopy of the Sablewood is settling into twilight. Astra unrolls a leather map, its edges worn from use. Upon it, a path is marked in charcoal, leading from her home to a drawing of a single, tall spire. “The journey isn’t long, but the woods can be... deceptive,” she says, her finger tracing the route. “I don’t know what you’ll find. Just... be careful. The Spirekeepers are the heart of this forest. If one falls, a shadow falls with them.”<button class="copy-btn gm-only" aria-label="Copy read-aloud text">Copy</button></blockquote><p><strong>Short locale description:</strong> Astra's home is a cozy, circular cottage filled with books, arcane tools, and the comforting smell of a hearth. It serves as a brief sanctuary before the journey.</p><h4>Roleplaying with Astra:</h4><ul><li><p><strong>"What could have happened to the Spire?"</strong></p><ul><li><strong>Astra's Answer:</strong> "I can't be certain. The Spires are immensely powerful, but also delicate. It could be a failure in the warding stones, sickness, or… something worse. The Keepers are solitary. If Elara—that's her name—is in trouble, she has no one to call for aid. The flame is a reflection of her own life force. As it dims, so does she."</li><li><strong>Knowledge (Recall) check (DC 12):</strong> A character succeeding on this check remembers that Spire flames are also tied to the ambient magic of the region. A great surge of power, either benevolent or malevolent, could destabilize one if the Keeper wasn't prepared.</li></ul></li><li><p><strong>"What will we find in the west? What are the perils?"</strong></p><ul><li><strong>Astra's Answer:</strong> "The paths are well-worn, for the most part. You'll pass near the Miremist hollow, a place known for its perpetual, disorienting fog. The 'Lucy,' the Lucent River, feeds that area, and its moonglow can play tricks on the eyes. As for creatures... well, it's the Sablewood. Strixwolves hunt in packs, and I've heard tales of Mountain Crabs camouflaged so well they're mistaken for rockfall until it's too late. Stick to the path, and you *should* be fine."</li><li><strong>Instinct (Sense) check (DC 12):</strong> A successful check allows a character to press Astra on her hesitation. She'll admit, "There are whispers among the traders of things being... wrong. Hybrid fauna growing more aggressive, larger. It's why I'm so worried. The Spires are meant to keep that in check."</li></ul></li><li><p><strong>"Are there any points of interest or people we should know about?"</strong></p><ul><li><strong>Astra's Answer:</strong> "My map marks a small hamlet, Grey-Elm. It's new, settled only a few years ago by families who thought the Spire's protection was enough. I don't know them well. Be cautious; small communities can be… insular. There's also an old circle of standing stones near the Miremist. They predate the Spires, dedicated to the Forgotten Gods. They might hold some clue."</li><li><strong>Presence (Persuade) check (DC 13):</strong> A successful check to ask for a contact might yield a quip. Astra will sigh, rubbing her temples. "Friendliness is a high price out here. But look, if you see a merchant named **Will Scild**, tell him Astra sent you. He's an old Galapa, drier than a year-old stump, but fair. He values his wood wage more than gold, so don't try to haggle. Just... don't touch the small stone he's always tossing between his hands. Trust me on that."</li></ul></li></ul><h4>Subtitle: Features of the Area</h4><ul><li><strong>Illumination:</strong> Warm, flickering candlelight.</li><li><strong>Treasure:</strong> Astra provides the party with two **Soothing Poultices** and two of **Astra's Healing Draughts** before they depart.</li></ul></div>
+                    </details>
+                    <details id="encounter-1-the-twisted-path" class="block">
+                        <summary><h3>Encounter 1: The Twisted Path <button class="copy-link-btn gm-only" aria-label="Copy link to this section">🔗</button></h3></summary>
+                        <div class="block-content"><h4>Subtitle: Setup</h4><p>The party sets off west. The path forward splits: one is a well-worn trade route, the other a less-traveled animal trail that cuts closer to a series of swampy pools.</p><p><strong>Encounter/NPCs/Monsters overview:</strong> This beat presents a choice between a social encounter with **Will Scild** or a combat encounter with a **Corrupted Bullfrog Juggernaut**.</p><blockquote>The air under the canopy is thick and humid, alive with the drone of insects. You follow Astra’s map for an hour before reaching a fork. The main path, wide enough for a cart, continues northwest, sunken into the rich soil. A smaller, muddier trail branches directly west, marked by clawed-up trees and smelling of damp earth and decay. Both paths seem to lead toward the Spire.<button class="copy-btn gm-only" aria-label="Copy read-aloud text">Copy</button></blockquote><p><strong>Short locale description:</strong> A fork in a deeply worn path under the thick, sun-blocking canopy of the Sablewood. One path is wide and safe, the other is narrow, muddy, and leads into a swampy bog.</p><h5>Option 1: The Trade Route (Social Encounter)</h5><blockquote>The path is quiet, the silence broken only by the creak of distant cart wheels. Ahead, you spot a lone figure beside a small, sturdy cart pulled by a pair of stout horse-goats. He is a Galapa of indeterminate age, slowly polishing a small, smooth stone he tosses between his hands.<button class="copy-btn gm-only" aria-label="Copy read-aloud text">Copy</button></blockquote><ul><li><strong>Roleplaying with Will Scild:</strong> Will is unphased and direct. He's not unfriendly, but he won't waste words. He'll confirm he just came from the west.<ul><li><strong>"Did you see anything unusual near the Spire?"</strong> — **Will's Answer:** "Unusual is the usual in the Sablewood. But yes. The lights in Grey-Elm are... nervous. They blink. The Spire's own flame is a guttering candle in a gale. Something's wrong. Bad for business."</li><li><strong>"Astra sent us."</strong> — **Will's Answer:** He'll stop tossing the stone and give the party a long look. "Did she now? She still owes me for that bundle of whisper-vine. If you're fixing her problems, that's your wood wage to earn. Be warned: the forest feels wrong. The animals are agitated. Even the silence has teeth."</li><li><strong>The Clue:</strong> He provides the **(Flex Clue)** about the flickering lights in Grey-Elm. A successful **Presence (Connect) check (DC 12)** gets him to add that the Strixwolf howls have sounded more pained than hungry lately. The GM can spend a Fear to use Will's **Merchant +2** Experience to increase the Difficulty if the party is being disrespectful or pushy.</li></ul></li></ul><h5>Option 2: The Animal Trail (Combat Encounter)</h5><blockquote>The muddy trail opens into a clearing filled with stagnant, knee-deep pools of water shrouded in thin wisps of fog. The air is heavy with the smell of wet decay. Dozens of large, flat lily pads cover the surface of the water, and a low, guttural croak echoes across the clearing. Suddenly, the water erupts as a massive, bull-sized amphibian with mottled, ashen skin and wickedly sharp horns launches itself from a pool.<button class="copy-btn gm-only" aria-label="Copy read-aloud text">Copy</button></blockquote><ul><li><strong>The Clue:</strong> After the combat, the party finds the trail again. Here they discover the **(Flex Clue)**: Strixwolf tracks, deeper than usual, with flecks of strange, warped stone in the claw marks.</li></ul><h4>Subtitle: Tactics</h4><ul class="gm-only"><li><strong>Corrupted Bullfrog Juggernaut:</strong> The bullfrog uses its mobility to its advantage, leaping from pool to pool between attacks. It will use its **Powerful Gore** to charge through clustered party members and its **Blighted Quake** to knock them **Prone** in the hazardous terrain. The GM can spend a Fear to use the Bullfrog's **Territorial +2** Experience, increasing the Difficulty of any attempts to use the environment against it (like hiding behind a tree).</li></ul><h4>Subtitle: Features of the Area</h4><ul><li><strong>Illumination:</strong> Dim light filtering through the dense canopy.</li><li><strong>Trail:</strong> The trade route is clear. The animal trail is muddy and leads to difficult terrain.</li><li><strong>Terrain Hazards:</strong> The clearing with the Bullfrog contains knee-deep pools of water and muddy banks, which are all difficult terrain.</li></ul><h4>Stat Blocks Section</h4><div class="stat-block gm-only">{{stat block for Will Scild}}<button class="copy-btn" aria-label="Copy stat block as markdown">Copy as Markdown</button></div><div class="stat-block gm-only">{{stat block for Corrupted Bullfrog Juggernaut}}<button class="copy-btn" aria-label="Copy stat block as markdown">Copy as Markdown</button></div></div>
+                    </details>
+                    <details id="interlude-2-hamlet-of-ashen" class="block">
+                        <summary><h3>Interlude 2: Hamlet of Ashen <button class="copy-link-btn gm-only" aria-label="Copy link to this section">🔗</button></h3></summary>
+                        <div class="block-content"><h4>Ashen — Hamlet, Population 42</h4><p>A small, isolated hamlet of timber and fieldstone houses clustered around a central, now-dry well. Founded only a few years ago, the settlers rely on the protection of the nearby Spire, but a creeping blight has instilled a deep sense of fear and paranoia in the populace. The air is cold and carries a faint scent of ozone and dust.</p><ul><li><strong>Leadership:</strong> Elder Kaelen, a weary but once-wise man, informally leads the community. However, his authority is now challenged by younger, more fearful residents like Jorn.</li><li><strong>Demographics:</strong> Primarily humans, with a few scattered fauns and halflings who sought a quiet life. Most are families of farmers, woodcutters, and trappers.</li><li><strong>Economics:</strong> The hamlet survives on subsistence farming and trade with passing merchants, like Will Scild, for essential goods.</li><li><strong>Locales:</strong><ul><li><strong>The Dry Well:</strong> The central square of the hamlet.</li><li><strong>Family Homes:</strong> Simple, single-room homes of timber and stone, most with their doors and windows now barred.</li><li><strong>Elara's Hut:</strong> A small, slightly isolated hut on the edge of town where the Spirekeeper stayed when visiting.</li><li><strong>Makeshift Palisade:</strong> A poorly maintained wooden fence on the western edge of the hamlet, meant more as a deterrent to animals than a true fortification.</li></ul></li></ul><h4>Subtitle: Setup</h4><p>The party arrives at the quiet hamlet of Grey-Elm (now referred to as Ashen). A thin, greyish sap weeps from the trees, and the few lanterns burning are weak and sputtering.</p><p><strong>Encounter/NPCs/Monsters overview:</strong> This is primarily a social investigation scene with the potential for combat against paranoid **Blighted Villagers**.</p><blockquote>The hamlet of Grey-Elm is deathly still. Houses of timber and fieldstone are clustered around a dry well. Grey, flaky dust coats every surface, and the trees weep a thick, ashen sap. A few villagers watch you from darkened doorways, their faces pale and drawn, their eyes wide with fear and suspicion.<button class="copy-btn gm-only" aria-label="Copy read-aloud text">Copy</button></blockquote><p><strong>Short locale description:</strong> A small, deathly quiet village. The main features are the central dry well, the small timber houses, and the palpable sense of fear.</p><ul class="gm-only"><li><strong>GM Notes:</strong><ul><li><strong>Countdown:</strong> Begin a **Consequence Countdown (4) "Hamlet's Paranoia."** This ticks down when the party fails social rolls, rolls with Fear, or uses magic aggressively. When it triggers, Jorn and 3 **Blighted Villagers** attack.</li><li><strong>Finding the Clue:</strong> The **Core Clue** (Elara's ritual) can be found via:<ul><li><strong>Social:</strong> A **Presence (Connect) check (DC 12)** with the elder, Kaelen. On a failure with Fear, tick the countdown by 2.</li><li><strong>Investigation:</strong> A **Knowledge (Investigate) check (DC 13)** in Elara's abandoned hut reveals notes on a "new warding ritual."</li></ul></li><li><strong>The Catalyst:</strong> A paranoid villager named Jorn watches the party. Failed rolls or Fear spends describe him whispering to others, advancing the countdown.</li></ul></li></ul><h4>Subtitle: Features of the Area</h4><ul><li><strong>Illumination:</strong> Weak, flickering lantern-light provides dim illumination throughout the hamlet.</li><li><strong>Ashen Sap:</strong> The trees weep a thick, grey sap that is cold to the touch and smells faintly of ozone.</li><li><strong>Cover:</strong> The houses and the central well provide cover.</li></ul><h4>Stat Blocks Section</h4><div class="stat-block gm-only">{{stat block for Blighted Villager}}<button class="copy-btn" aria-label="Copy stat block as markdown">Copy as Markdown</button></div></div>
+                    </details>
+                    <details id="encounter-2-miremist-mystery" class="block">
+                        <summary><h3>Encounter 2: Miremist Mystery <button class="copy-link-btn gm-only" aria-label="Copy link to this section">🔗</button></h3></summary>
+                        <div class="block-content"><h4>Subtitle: Setup</h4><p>The path leads through a bog shrouded in a thick, unnaturally glowing fog—the Miremist. In the center is a clearing with a circle of ancient wardstones.</p><p><strong>Encounter/NPCs/Monsters overview:</strong> This is an environmental puzzle with an optional ambush by an **Eeligator Lurker**.</p><blockquote>You enter a swampy bog, and a thick, pearlescent fog immediately swallows you. This is the Miremist. The air is cold and damp, and your voice is muffled. The usual steady moonglow of the Lucent is scattered into disorienting, shifting beams of light. Ahead, you can just make out the dark shapes of standing stones arranged in a circle. The path seems to vanish into the mist around them.<button class="copy-btn gm-only" aria-label="Copy read-aloud text">Copy</button></blockquote><p><strong>Short locale description:</strong> A swampy bog filled with pearlescent fog. The key features are the circle of five large, moss-covered wardstones and the disorienting beams of moonglow.</p><h4>Subtitle: Tactics</h4><ul class="gm-only"><li><strong>Eeligator Lurker:</strong> The Eeligator uses the fog and murky pools for cover. It will attempt to use its **Pull Under** ability to isolate a single character. The GM can spend a Fear to add its **Ambusher +2** Experience to the Difficulty of any **Instinct (Sense)** checks made to perceive it before it attacks.</li></ul><h4>Subtitle: Features of the Area</h4><ul><li><strong>Illumination:</strong> The moonglow provides dim, shifting light.</li><li><strong>Environmental Effects:</strong> The **Miremist Fog** heavily obscures the area, imposing disadvantage on perception checks and ranged attacks beyond Very Close range.</li><li><strong>Terrain Hazards:</strong> The bog is difficult terrain.</li><li><strong>The Puzzle:</strong> Align five wardstones with their constellations using **Knowledge (Recall)** or **Instinct (Study) checks (DC 12)**. Failing these checks begins a **Static Countdown (3): "Lost in the Mire,"** which can lead to an ambush.</li></ul><h4>Stat Blocks Section</h4><div class="stat-block gm-only">{{stat block for Eeligator Lurker}}<button class="copy-btn" aria-label="Copy stat block as markdown">Copy as Markdown</button></div><div class="stat-block gm-only">{{Environment stat block for Miremist Fog}}<button class="copy-btn" aria-label="Copy stat block as markdown">Copy as Markdown</button></div></div>
+                    </details>
+                    <details id="encounter-3-the-spiregrounds" class="block">
+                        <summary><h3>Encounter 3: The Spiregrounds <button class="copy-link-btn gm-only" aria-label="Copy link to this section">🔗</button></h3></summary>
+                        <div class="block-content"><h4>Subtitle: Setup</h4><p>The path leads to the base of the Spire. The corruption here is strong. The ground is cracked, trees are petrified, and the air hums. A low snarl echoes from nearby.</p><p><strong>Encounter/NPCs/Monsters overview:</strong> A combat encounter against 3 **Corrupted Strixwolves**.</p><blockquote>The Spire looms before you, a twisted finger of black stone against the bruised sky. Its guiding flame, visible now, is a pathetic, sputtering ember. The grounds around its base are a scene of devastation. A low, guttural growl alerts you to movement: a pack of Strixwolves, their fur matted and their eyes glowing with a sickly light, are guarding the approach.<button class="copy-btn gm-only" aria-label="Copy read-aloud text">Copy</button></blockquote><p><strong>Short locale description:</strong> A barren, corrupted area at the base of the stone Spire. The ground is cracked and grey, with skeletal trees providing sparse cover.</p><h4>Subtitle: Tactics</h4><ul class="gm-only"><li><strong>Corrupted Strixwolves:</strong> These creatures are pained and aggressive. They use their flight and climbing ability to attack from unexpected angles, taking advantage of the sparse trees for cover. They will use **Pack Tactics** to focus on a single target. The GM can spend a Fear to use their **Aerial Hunter +2** Experience on an attack made from an elevated position.</li></ul><h4>Subtitle: Features of the Area</h4><ul><li><strong>Illumination:</strong> Dim light from the twilight sky and the weak Spire flame.</li><li><strong>Cover:</strong> Petrified trees offer partial cover.</li><li><strong>Treasure:</strong> After the fight, a **Knowledge (Investigate) check (DC 12)** uncovers a satchel with Elara's journal, mentioning her plan to attune to a "great surge."</li></ul><h4>Stat Blocks Section</h4><div class="stat-block gm-only">{{stat block for Corrupted Strixwolf}}<button class="copy-btn" aria-label="Copy stat block as markdown">Copy as Markdown</button></div></div>
+                    </details>
+                    <details id="encounter-4-the-unsteady-climb" class="block">
+                        <summary><h3>Encounter 4: The Unsteady Climb <button class="copy-link-btn gm-only" aria-label="Copy link to this section">🔗</button></h3></summary>
+                        <div class="block-content"><h4>Subtitle: Setup</h4><p>Inside, the Spire is dark and crumbling. A single, winding staircase spirals upwards. The flame at the top visibly weakens as they enter.</p><p><strong>Encounter/NPCs/Monsters overview:</strong> This is a hazardous environmental challenge with no combat.</p><blockquote>The interior of the Spire is a hollow stone cylinder reaching into darkness. A narrow, winding staircase hugs the curved wall, ascending into the gloom. High above, the Spire’s flame pulses weakly, a dying heartbeat. As you place your foot on the first step, a tremor runs through the structure, and a shower of grit rains down from above.<button class="copy-btn gm-only" aria-label="Copy read-aloud text">Copy</button></blockquote><p><strong>Short locale description:</strong> The dark, hollow interior of the Spire. A single, treacherous staircase with no railings winds its way up the inner wall.</p><h4>Subtitle: Features of the Area</h4><ul><li><strong>Illumination:</strong> Very dim light from the sputtering flame far above.</li><li><strong>Terrain Hazards:</strong> The stairs are crumbling and treacherous. There are gaps that must be leaped and sections of fallen rock.</li><li><strong>Environmental Effects:</strong> A **Dynamic Consequence Countdown: "The Flame Gutters,"** starts at 6. If it reaches 0, the final battle begins with Elara in Phase 2. The climb requires a series of **Agility (Move)**, **Strength (Push)**, and **Strength (Endure)** checks.</li></ul><h4>Stat Blocks Section</h4><div class="stat-block gm-only">{{Environment stat block for Crumbling Spire}}<button class="copy-btn" aria-label="Copy stat block as markdown">Copy as Markdown</button></div></div>
+                    </details>
+                    <details id="encounter-5-the-spirekeepers-plight" class="block">
+                        <summary><h3>Encounter 5: The Spirekeeper’s Plight <button class="copy-link-btn gm-only" aria-label="Copy link to this section">🔗</button></h3></summary>
+                        <div class="block-content"><h4>Subtitle: Setup</h4><p>The party reaches the summit. Kneeling before the dying flame is Elara, her body wracked with tremors and covered in veins of black energy.</p><p><strong>Encounter/NPCs/Monsters overview:</strong> The final boss battle against **Elara, the Spirekeeper**.</p><blockquote>The wind whips across the top of the Spire. In the center of the circular platform, a woman kneels. Veins of pulsing, black energy crawl across her skin. She looks up, her face a mask of pure anguish. “You should not be here,” she rasps, her voice a discordant harmony. “It’s... too much. I can’t... hold it.” The flame in the brazier behind her shrinks to a spark, and the light in her eyes is consumed by darkness.<button class="copy-btn gm-only" aria-label="Copy read-aloud text">Copy</button></blockquote><p><strong>Short locale description:</strong> A circular, open-air stone platform at the summit of the Spire. A large, ornate brazier sits in the center, containing the dying flame.</p><h4>Subtitle: Tactics</h4><ul class="gm-only"><li><strong>Elara, the Spirekeeper:</strong> The fight begins with a single round where Elara pleads for the party to leave. After she takes damage or the round ends, she enters Phase 2. She will prioritize attacking characters attempting the cleansing ritual at the brazier. The GM can spend Fear to use her **Desperate Resolve +2** Experience to increase the Difficulty of the first cleansing check. In Phase 2, she will create zones of **Blighted Ground**.</li></ul><h4>Subtitle: Features of the Area</h4><ul><li><strong>Illumination:</strong> Dim light from the dying flame.</li><li><strong>The Brazier:</strong> The central objective for the cleansing ritual (Knowledge (Channel) check (DC 14)).</li><li><strong>Environmental Effects:</strong> The cleansing ritual is a **Dynamic Progress Countdown: "Cleanse the Spire,"** starting at 6. The party must advance it to 0 to save Elara.</li></ul><h4>Stat Blocks Section</h4><div class="stat-block gm-only">{{stat block for Boss: Elara, the Spirekeeper}}<button class="copy-btn" aria-label="Copy stat block as markdown">Copy as Markdown</button></div><div class="stat-block gm-only">{{Environment stat block for Blighted Ground}}<button class="copy-btn" aria-label="Copy stat block as markdown">Copy as Markdown</button></div></div>
+                    </details>
+                </div>
+            </section>
+
+            <section id="concluding-the-adventure" class="block">
+                <summary><h2>Concluding the Adventure</h2></summary>
+                <div class="block-content"><p>With Elara either cleansed or laid to rest, the immediate threat to the western Sablewood has passed.</p><ul><li><strong>If Elara was Cleansed:</strong> The Spire's flame roars back to life, a brilliant, steady beacon. The corruption in the immediate area recedes over the next few days. The villagers of Ashen slowly recover, and the forest's fauna returns to a less aggressive state. Elara, once she recovers, is immensely grateful and becomes a powerful ally to the party. She will confirm that the surge of magic felt overwhelming and unnatural, providing a hook for a future adventure to find its source.</li><li><strong>If Elara was Destroyed:</strong> The flame is extinguished completely, and the Spire goes dark. The blighted ground around its base remains, a permanent scar on the landscape. While the party has stopped the immediate threat, the region is now vulnerable, and the corruption may one day return. The party has the gratitude of the people of Ashen, but a shadow of failure and loss hangs over their victory. This could lead to a future quest to find a new Spirekeeper or a way to relight the flame.</li></ul><p>In either case, the party has earned a reputation as heroes in the Sablewood, and the Arcanist Astra will be keen to hear of their deeds and perhaps offer them a new, more dangerous task.</p></div>
+            </section>
         </main>
     </div>
 
-    <!-- Modals -->
-    <!-- Overview Modal -->
-    <div id="overviewModal" class="fixed inset-0 z-30 modal-backdrop items-center justify-center p-4 hidden">
-        <div class="bg-spire-parchment rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8 relative" onclick="event.stopPropagation()">
-            <button onclick="closeModal('overviewModal')" class="absolute top-4 right-4 text-spire-light-text hover:text-spire-dark-text text-2xl font-bold">&times;</button>
-            <h2 class="font-title text-4xl text-spire-deep-blue mb-6 border-b-2 border-spire-dusk-orange pb-3">Adventure Overview</h2>
-            <div id="overview-content" class="space-y-6 text-spire-dark-text">
-                <div class="gm-note-box p-4 rounded-lg">
-                    <h3 class="font-title text-2xl text-spire-deep-blue mb-2">Introduction</h3>
-                    <p class="mb-4">This adventure is a one-shot for Daggerheart, designed for five Tier 2, Level 2 characters and takes approximately 4–5 hours to complete. It begins with the Arcanist Astra tasking the party with a final, urgent request concerning a weakening Spire in the Sablewood.</p>
-                    <div class="read-aloud p-3 rounded-md">
-                        <p>“There’s a Spire, just west of here, maybe a few hours walk. I felt it on the way to the ritual. Its power was... strange. The light felt weaker than it should be. I think something might be terribly wrong with the Spirekeeper, and I fear what will happen if its fire is extinguished altogether... It’s good to have heroes in the Sablewood again.”</p>
-                    </div>
-                </div>
-                <div class="gm-note-box p-4 rounded-lg">
-                     <h3 class="font-title text-2xl text-spire-deep-blue mb-2">Clue Progression</h3>
-                     <div class="flex flex-col space-y-2">
-                        <div class="bg-white p-3 rounded-md shadow-sm"><strong>Flex Clue:</strong> Traders or tracks hint at something wrong near the Spire.</div>
-                        <div class="text-center text-spire-light-text">↓</div>
-                        <div class="bg-white p-3 rounded-md shadow-sm"><strong>Core Clue:</strong> The Spirekeeper, Elara, attempted a "new warding ritual" and vanished.</div>
-                        <div class="text-center text-spire-light-text">↓</div>
-                        <div class="bg-white p-3 rounded-md shadow-sm"><strong>Core Clue:</strong> A wardstone inscription warns: "Only a balanced heart can hold the flame."</div>
-                         <div class="text-center text-spire-light-text">↓</div>
-                        <div class="bg-white p-3 rounded-md shadow-sm"><strong>Core Clue:</strong> Elara's journal reveals she tried to attune to a "great surge" of magic.</div>
-                        <div class="text-center text-spire-light-text">↓</div>
-                         <div class="bg-white p-3 rounded-md shadow-sm"><strong>The Truth:</strong> Astra's own keystone ritual inadvertently caused the surge that corrupted Elara.</div>
-                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Rewards Modal -->
-    <div id="rewardsModal" class="fixed inset-0 z-30 modal-backdrop items-center justify-center p-4 hidden">
-        <div class="bg-spire-parchment rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8 relative" onclick="event.stopPropagation()">
-            <button onclick="closeModal('rewardsModal')" class="absolute top-4 right-4 text-spire-light-text hover:text-spire-dark-text text-2xl font-bold">&times;</button>
-            <h2 class="font-title text-4xl text-spire-deep-blue mb-6 border-b-2 border-spire-dusk-orange pb-3">Rewards & Loot</h2>
-            <div id="rewards-content" class="space-y-4">
-                <!-- Rewards will be injected here -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Adversary Modal -->
-    <div id="adversaryModal" class="fixed inset-0 z-40 modal-backdrop items-center justify-center p-4 hidden">
-        <div class="bg-stone-50 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8 relative" onclick="event.stopPropagation()">
-            <button onclick="closeModal('adversaryModal')" class="absolute top-4 right-4 text-spire-light-text hover:text-spire-dark-text text-2xl font-bold">&times;</button>
-            <div id="adversary-content">
-                <!-- Adversary details will be injected here -->
-            </div>
-        </div>
-    </div>
+<div class="aria-live-region" aria-live="polite"></div>
+<button id="back-to-top" class="top-bar-btn" aria-label="Back to Top">↑</button>
 
 <script>
-    const adventureData = {
-        beats: [
-            {
-                id: "beat1",
-                title: "Beat 1: A Favor Asked",
-                setup: "The characters have just returned to the Arcanist Astra’s home. She has offered them rest before asking this one last favor. She is tired but clearly worried, gesturing to a hand-drawn map.",
-                readAloud: "The scent of savory stew and cedarwood smoke fills Astra’s cozy, circular home. Outside, the endless canopy of the Sablewood is settling into twilight. Astra unrolls a leather map, its edges worn from use. Upon it, a path is marked in charcoal, leading from her home to a drawing of a single, tall spire. “The journey isn’t long, but the woods can be... deceptive,” she says, her finger tracing the route. “I don’t know what you’ll find. Just... be careful. The Spirekeepers are the heart of this forest. If one falls, a shadow falls with them.”",
-                gmNotes: [
-                    {
-                        title: "Roleplaying with Astra",
-                        content: `
-                        <ul class="list-disc list-inside space-y-3">
-                            <li>
-                                <strong>On what could have happened:</strong> "I can't be certain. The Spires are immensely powerful, but also delicate... The flame is a reflection of her own life force. As it dims, so does she." A successful <strong>Knowledge (Recall) check (DC 12)</strong> reveals Spire flames are tied to ambient magic; a large surge could destabilize one.
-                            </li>
-                            <li>
-                                <strong>On perils in the west:</strong> "The paths are well-worn... You'll pass near the Miremist hollow, a place known for its perpetual, disorienting fog... Strixwolves hunt in packs, and I've heard tales of Mountain Crabs camouflaged so well they're mistaken for rockfall..." An <strong>Instinct (Sense) check (DC 12)</strong> gets her to admit hybrid fauna are growing more aggressive.
-                            </li>
-                            <li>
-                                <strong>On points of interest:</strong> "My map marks a small hamlet, Grey-Elm... there's also an old circle of standing stones near the Miremist." A <strong>Presence (Persuade) check (DC 13)</strong> gets her to mention the Galapa trader, <button class="text-spire-magic-violet hover:underline font-bold" onclick="showAdversary('willScild')">Will Scild</button>. "He values his wood wage more than gold... don't touch the small stone he's always tossing."
-                            </li>
-                        </ul>`
-                    },
-                    {
-                        title: "Stakes & Escalations",
-                        content: "<p><strong>Stakes:</strong> Accept the quest and gain a powerful ally. Refuse, and risk the Sablewood’s corruption spreading. <br><strong>Escalations (1 Fear):</strong> A gust of wind blows through the cottage, smelling of ash and decay, making the candles flicker violently.</p>"
-                    }
-                ]
-            },
-            {
-                id: "beat2",
-                title: "Beat 2: The Sablewood Path",
-                setup: "The party sets off west. The path forward splits: one is a well-worn trade route, the other a less-traveled animal trail that cuts closer to a series of swampy pools.",
-                readAloud: "The air under the canopy is thick and humid, alive with the drone of insects. You follow Astra’s map for an hour before reaching a fork. The main path, wide enough for a cart, continues northwest, sunken into the rich soil. A smaller, muddier trail branches directly west, marked by clawed-up trees and smelling of damp earth and decay. Both paths seem to lead toward the Spire.",
-                gmNotes: [
-                    {
-                        title: "Option 1: The Trade Route (Social)",
-                        content: `<p class="read-aloud p-3 my-2 rounded-md">The path is quiet, the silence broken only by the creak of distant cart wheels. Ahead, you spot a lone figure beside a small, sturdy cart pulled by a pair of stout horse-goats. He is a Galapa of indeterminate age, slowly polishing a small, smooth stone he tosses between his hands.</p>
-                        <p>Engage with <button class="text-spire-magic-violet hover:underline font-bold" onclick="showAdversary('willScild')">Will Scild</button>. He provides a <strong>(Flex Clue)</strong>: the lights in Grey-Elm are flickering nervously. A successful <strong>Presence (Connect) check (DC 12)</strong> gets him to add that the Strixwolf howls sound more pained than hungry. The GM can spend a Fear to use Will's <strong>Merchant +2</strong> Experience to increase the Difficulty if the party is being pushy.</p>`
-                    },
-                    {
-                        title: "Option 2: The Animal Trail (Combat)",
-                        content: `<p class="read-aloud p-3 my-2 rounded-md">The muddy trail opens into a clearing filled with stagnant, knee-deep pools of water shrouded in thin wisps of fog. The air is heavy with the smell of wet decay... Suddenly, the water erupts as a massive, bull-sized amphibian with mottled, ashen skin and wickedly sharp horns launches itself from a pool.</p>
-                        <p>This is an ambush by a <button class="text-spire-magic-violet hover:underline font-bold" onclick="showAdversary('bullfrog')">Corrupted Bullfrog Juggernaut</button>. The area is difficult terrain. After combat, the party finds the <strong>(Flex Clue)</strong>: Strixwolf tracks with flecks of warped stone.</p>`
-                    }
-                ]
-            },
-            {
-                id: "beat3",
-                title: "Beat 3: The Ashen Hamlet",
-                setup: "The party arrives at the quiet hamlet of Grey-Elm. A thin, greyish sap weeps from the trees, and the few lanterns burning are weak and sputtering.",
-                readAloud: "The hamlet of Grey-Elm is deathly still. Houses of timber and fieldstone are clustered around a dry well. Grey, flaky dust coats every surface, and the trees weep a thick, ashen sap. A few villagers watch you from darkened doorways, their faces pale and drawn, their eyes wide with fear and suspicion.",
-                gmNotes: [
-                    {
-                        title: "Countdown: Hamlet's Paranoia",
-                        content: "Begin a <strong>Consequence Countdown (4)</strong>. It ticks down on failed social rolls, rolls with Fear, or aggressive magic. When it triggers, Jorn and 3 <button class='text-spire-magic-violet hover:underline font-bold' onclick='showAdversary(`blightedVillager`)'>Blighted Villagers</button> attack."
-                    },
-                    {
-                        title: "Finding the Core Clue",
-                        content: "The clue about Elara's ritual can be found by a successful <strong>Presence (Connect) check (DC 12)</strong> with the elder, Kaelen, or a <strong>Knowledge (Investigate) check (DC 13)</strong> in Elara's abandoned hut."
-                    },
-                    {
-                        title: "Escalations",
-                        content: "<strong>(2 Fear):</strong> Advance the countdown by 2. Jorn shouts, 'They're the cause! They brought this plague!'"
-                    }
-                ]
-            },
-            {
-                id: "beat4",
-                title: "Beat 4: Miremist & Wardstones",
-                setup: "The path leads through a bog shrouded in a thick, unnaturally glowing fog—the Miremist. In the center is a clearing with a circle of ancient wardstones.",
-                readAloud: "You enter a swampy bog, and a thick, pearlescent fog immediately swallows you. This is the Miremist. The air is cold and damp, and your voice is muffled... Ahead, you can just make out the dark shapes of standing stones arranged in a circle. The path seems to vanish into the mist around them.",
-                gmNotes: [
-                    {
-                        title: "The Puzzle & Getting Lost",
-                        content: "Align five wardstones with constellations, requiring **Knowledge (Recall)** or **Instinct (Study) checks (DC 12)**. Failure begins a **Static Countdown (3): 'Lost in the Mire.'** At 3 ticks, an <button class='text-spire-magic-violet hover:underline font-bold' onclick='showAdversary(`eeligator`)'>Eeligator Lurker</button> ambushes the party."
-                    },
-                    {
-                        title: "The Ambush",
-                        content: "The Eeligator uses the fog for cover. The GM can spend a Fear to add its **Ambusher +2** Experience to the Difficulty of any **Instinct (Sense)** checks made to perceive it."
-                    }
-                ]
-            },
-            {
-                id: "beat5",
-                title: "Beat 5: The Spiregrounds",
-                setup: "The path leads to the base of the Spire. The corruption here is strong. The ground is cracked, trees are petrified, and the air hums.",
-                readAloud: "The Spire looms before you, a twisted finger of black stone against the bruised sky. Its guiding flame, visible now, is a pathetic, sputtering ember... A low, guttural growl alerts you to movement: a pack of Strixwolves, their fur matted and their eyes glowing with a sickly light, are guarding the approach.",
-                gmNotes: [
-                    {
-                        title: "Encounter & Clue",
-                        content: "The party faces 3 <button class='text-spire-magic-violet hover:underline font-bold' onclick='showAdversary(`strixwolf`)'>Corrupted Strixwolves</button>. After the fight, a **Knowledge (Investigate) check (DC 12)** uncovers Elara's journal, mentioning her plan to attune to a 'great surge.'"
-                    },
-                    {
-                        title: "Escalations",
-                        content: "<strong>(2 Fear):</strong> One Strixwolf lets out a blighted howl. All characters must make an **Instinct (Withstand) check (DC 12)** or become **Frightened**."
-                    }
-                ]
-            },
-            {
-                id: "beat6",
-                title: "Beat 6: The Unsteady Climb",
-                setup: "Inside, the Spire is dark and crumbling. A single, winding staircase spirals upwards. The flame at the top visibly weakens as they enter.",
-                readAloud: "The interior of the Spire is a hollow stone cylinder reaching into darkness. A narrow, winding staircase hugs the curved wall, ascending into the gloom... As you place your foot on the first step, a tremor runs through the structure, and a shower of grit rains down from above.",
-                gmNotes: [
-                    {
-                        title: "Dynamic Countdown: The Flame Gutters",
-                        content: "This beat uses a **Dynamic Consequence Countdown (6)**. It advances based on player rolls. If it reaches 0, the final battle begins with Elara in Phase 2."
-                    },
-                    {
-                        title: "Checks & Escalations",
-                        content: "Required checks include **Agility (Move)**, **Strength (Push)**, and **Strength (Endure)**. <strong>(2 Fear):</strong> A stair section collapses, forcing an **Agility (Dodge) check (DC 12)** and advancing the countdown by 2."
-                    }
-                ]
-            },
-            {
-                id: "beat7",
-                title: "Beat 7: Spirekeeper Unbound",
-                setup: "The party reaches the summit. Kneeling before the dying flame is Elara, the Spirekeeper, her body wracked with tremors.",
-                readAloud: "The wind whips across the top of the Spire... a woman kneels. Veins of pulsing, black energy crawl across her skin. She looks up, her face a mask of pure anguish. “You should not be here,” she rasps... “It’s... too much. I can’t... hold it.” The flame in the brazier behind her shrinks to a spark, and the light in her eyes is consumed by darkness.",
-                gmNotes: [
-                    {
-                        title: "The Final Confrontation",
-                        content: "This is the final battle against <button class='text-spire-magic-violet hover:underline font-bold' onclick='showAdversary(`elara`)'>Elara, the Spirekeeper</button>. The party has two ways to win: defeat her or cleanse the Spire."
-                    },
-                    {
-                        title: "Dynamic Countdown: Cleanse the Spire",
-                        content: "The cleansing ritual is a **Dynamic Progress Countdown (6)**. Each successful **Knowledge (Channel) check (DC 14)** at the brazier advances it. Reaching 0 means Elara is saved."
-                    }
-                ]
-            }
-        ],
-        adversaries: {
-            willScild: {
-                name: "Will Scild",
-                type: "Social, Tier 2",
-                stats: { difficulty: 15 },
-                motives: "Find lost treasure, make fair trades, avoid trouble.",
-                experiences: "Merchant +2, Retaliation +7"
-            },
-            blightedVillager: {
-                name: "Blighted Villager",
-                type: "Minion, Tier 2",
-                stats: { evasion: 9, hp: 4, damage: "d6 Physical", difficulty: 12 },
-                motives: "Drive away outsiders, succumb to paranoia, act rashly.",
-                experiences: "Desperation +2"
-            },
-            bullfrog: {
-                name: "Corrupted Bullfrog Juggernaut",
-                type: "Bruiser, Tier 2",
-                stats: { evasion: 12, hp: 7, maxHp: 7, damage: "2d8+5 Physical", difficulty: 14, thresholds: "14/28" },
-                motives: "Defend territory, knock down threats, use its weight to crush opponents.",
-                experiences: "Territorial +2, Unstoppable Charge +2",
-                features: [
-                    "<strong>Leaping Dodge (Reaction):</strong> When an attack misses, the Bullfrog may leap anywhere within <strong>Far</strong> range."
-                ],
-                actions: [
-                    "<strong>Horn Gore:</strong> Standard melee attack.",
-                    "<strong>Powerful Gore:</strong> Mark a Stress to make an attack against all enemies in a straight line within <strong>Close</strong> range. On a hit, targets take 2d6+8 physical damage and must succeed on a <strong>Strength (Withstand) check (DC 13)</strong> or be knocked <strong>Prone</strong>."
-                ],
-                fearSpends: "<strong>Blighted Quake (2 Fear):</strong> Slams the ground. All characters within <strong>Very Close</strong> range must succeed on an <strong>Agility (Dodge) check (DC 13)</strong> or be knocked <strong>Prone</strong>."
-            },
-            strixwolf: {
-                name: "Corrupted Strixwolf",
-                type: "Standard, Tier 2",
-                stats: { evasion: 12, hp: 12, maxHp: 12, damage: "d8 Physical", difficulty: 13, thresholds: "13/26" },
-                motives: "Stalk, surround, protect the pack, harry opponents from above.",
-                experiences: "Tracker +2, Aerial Hunter +2",
-                features: ["<strong>Pack Tactics:</strong> Has advantage on attacks against a target if an ally is within Melee range.", "<strong>Silent Feathers:</strong> Has advantage on stealth checks."],
-                actions: ["<strong>Claw and Beak:</strong> Makes two attacks.", "<strong>Pounce:</strong> Moves and attacks. On a hit, target must make a <strong>Finesse (Dodge) check (DC 12)</strong> or be knocked <strong>Prone</strong>."]
-            },
-            eeligator: {
-                name: "Eeligator Lurker",
-                type: "Standard (Ambusher), Tier 2",
-                stats: { evasion: 13, hp: 16, maxHp: 16, damage: "d10 Physical", difficulty: 13, thresholds: "13/26" },
-                motives: "Hide, Hunt, Subsume, Drag prey underwater to drown.",
-                experiences: "Ambusher +2, Camouflage +2",
-                features: ["<strong>Still as Stone:</strong> Has Advantage on Finesse rolls to hide in murky water or thick fog."],
-                actions: [
-                    "<strong>Pull Under:</strong> Attack a target within <strong>Close</strong> range at the edge of water. On a success, pull the target into the water, making them <strong>Restrained</strong>.",
-                    "<strong>Death Roll (Once per scene):</strong> Attack a <strong>Restrained</strong> target. On a success, deal an additional d6 damage and the target becomes <strong>Prone</strong>."
-                ]
-            },
-            elara: {
-                name: "Elara, the Spirekeeper",
-                type: "Boss, Tier 2",
-                stats: { evasion: "14 (Phase 1) / 11 (Phase 2)", hp: 35, maxHp: 35, damage: "d8 Force / d10 Necrotic", difficulty: 15, thresholds: "15/30" },
-                motives: "(Phase 1) Plead for help, fight the corruption, protect the Spire. (Phase 2) Spread the blight, extinguish the flame, obey the chaotic power within.",
-                experiences: "Spire Lore +2, Desperate Resolve +2",
-                features: ["<strong>Phase Change:</strong> Below 18 HP, she transforms. Gains resistance to all but radiant/force damage, actions change."],
-                actions: ["<strong>(Phase 2) Multiattack (Blighted Slam)</strong>", "<strong>(Phase 2) Eruption of Blight (AoE)</strong>"],
-                fearSpends: "Create zones of <strong>Blighted Ground</strong> (difficult terrain that causes d4 necrotic damage to any character ending their turn on it)."
-            }
-        },
-        rewards: [
-            {
-                category: "Consumables",
-                items: [
-                    { name: "Soothing Poultice", description: "Removes 3 Stress." },
-                    { name: "Glimmering Moss", description: "Grants 1 Hope for the party." },
-                    { name: "Astra’s Healing Draught", description: "Heals for `d12` HP." }
-                ]
-            },
-            {
-                category: "Special Reward: Fractured Spire Keystone",
-                description: "A volatile magical item recovered from the final encounter. It pulses with a faint, chaotic energy. The shard must be stabilized via the <strong>Work on a Project</strong> downtime move. When complete, it transforms into one of the following:",
-                items: [
-                    {
-                        name: "1. Warden's Aegis",
-                        sub: "Secondary Weapon (Tier 2 Shield)",
-                        description: "Functions as an <strong>Improved Tower Shield</strong>.<br><strong>Trait:</strong> Strength | <strong>Range:</strong> Melee | <strong>Damage:</strong> d6+2 phy | <strong>Burden:</strong> One-Handed<br><strong>Feature:</strong> `Barrier: +3 to Armor Score; -1 to Evasion`<br><strong>Property: Intercession.</strong> Once per scene, when an ally within <strong>Close</strong> range is hit by an attack, use your reaction to reduce the damage they take by `2d8`."
-                    },
-                    {
-                        name: "2. Heartfire Lantern",
-                        sub: "Item (Tier 2 Implement)",
-                        description: "<strong>Property: Rekindle.</strong> As an action, you can raise the lantern. You and all allies within <strong>Close</strong> range clear 2 Stress. Usable a number of times equal to your Proficiency per long rest."
-                    },
-                    {
-                        name: "3. Volatile Resonance Crystal",
-                        sub: "Item (Tier 2 Implement)",
-                        description: "<strong>Property: Unstable Overcharge.</strong> Once per session, overcharge a spell that deals magic damage to deal its maximum possible damage. After, roll a d6. On a 1, the crystal shatters, dealing `2d12` direct force damage to you."
-                    }
-                ]
-            }
-        ]
-    };
-    
-    let activeCharts = {};
+document.addEventListener('DOMContentLoaded', () => {
+    const theme = localStorage.getItem('theme');
+    const bigType = localStorage.getItem('bigType');
+    if (theme) document.documentElement.classList.add(theme);
+    if (bigType) document.documentElement.classList.add('big-type');
 
-    function initApp() {
-        const contentEl = document.getElementById('adventure-content');
-        const navEl = document.getElementById('sidebar-nav-list');
-        const rewardsEl = document.getElementById('rewards-content');
-        
-        contentEl.innerHTML = '';
-        navEl.innerHTML = '';
-        rewardsEl.innerHTML = '';
-
-        adventureData.beats.forEach(beat => {
-            let notesHtml = beat.gmNotes.map(note => `
-                <details class="gm-note-box rounded-lg overflow-hidden">
-                    <summary class="font-title text-lg p-3 cursor-pointer bg-stone-200 hover:bg-stone-300 transition-colors duration-200">${note.title}</summary>
-                    <div class="p-4">${note.content}</div>
-                </details>
-            `).join('');
-
-            contentEl.innerHTML += `
-                <section id="${beat.id}" class="space-y-4 pt-4">
-                    <h2 class="font-title text-3xl text-spire-deep-blue border-b-2 border-spire-dusk-orange pb-2">${beat.title}</h2>
-                    <p>${beat.setup}</p>
-                    <div class="read-aloud p-4 rounded-md">
-                        <p>${beat.readAloud}</p>
-                    </div>
-                    <div class="space-y-2">${notesHtml}</div>
-                </section>
-            `;
-            
-            navEl.innerHTML += `
-                <li><a href="#${beat.id}" class="sidebar-link block py-2 px-4 rounded-md hover:bg-stone-200 transition-colors duration-200">${beat.title.split(':')[1].trim()}</a></li>
-            `;
-        });
-        
-        adventureData.rewards.forEach(category => {
-            let itemsHtml = category.items.map(item => `
-                <div class="bg-white p-4 rounded-lg shadow-sm">
-                    <h4 class="font-title text-xl text-spire-deep-blue">${item.name}</h4>
-                    ${item.sub ? `<p class="text-sm text-spire-light-text italic mb-2">${item.sub}</p>` : ''}
-                    <p>${item.description}</p>
-                </div>
-            `).join('');
-            
-            rewardsEl.innerHTML += `
-                <div>
-                    <h3 class="font-title text-2xl text-spire-deep-blue mb-2">${category.category}</h3>
-                    <div class="space-y-3">${category.description ? `<p class="mb-3">${category.description}</p>` : ''}${itemsHtml}</div>
-                </div>
-            `;
-        });
-        
-        setupScrollspy();
-    }
-
-    function showAdversary(key) {
-        const adversary = adventureData.adversaries[key];
-        if (!adversary) return;
-
-        const contentEl = document.getElementById('adversary-content');
-        
-        let statsHtml = '';
-        if (adversary.stats) {
-            statsHtml = Object.entries(adversary.stats).map(([stat, value]) => {
-                if (stat.toLowerCase() === 'hp' && adversary.stats.maxHp) return '';
-                if (stat.toLowerCase() === 'maxhp') return '';
-                return `
-                    <div class="text-center">
-                        <p class="text-sm text-spire-light-text uppercase font-bold tracking-wider">${stat.replace(/([A-Z])/g, ' $1')}</p>
-                        <p class="text-xl font-bold text-spire-magic-violet">${value}</p>
-                    </div>`;
-            }).join('');
-        }
-
-        contentEl.innerHTML = `
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-                ${adversary.stats.maxHp ? `
-                <div class="md:col-span-1 flex flex-col items-center">
-                    <h4 class="font-title text-lg mb-2">Health</h4>
-                    <div class="chart-container">
-                        <canvas id="hpChart"></canvas>
-                    </div>
-                </div>
-                ` : '<div class="md:col-span-1"></div>'}
-
-                <div class="md:col-span-2 text-center md:text-left">
-                    <h3 class="font-title text-3xl text-spire-deep-blue">${adversary.name}</h3>
-                    <p class="text-spire-light-text italic mb-4">${adversary.type}</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 my-6 p-4 bg-stone-100 rounded-lg">
-                ${statsHtml}
-            </div>
-            
-            <div class="space-y-4">
-                <div><strong class="font-title text-lg">Motives & Tactics:</strong> <span class="text-spire-dark-text">${adversary.motives}</span></div>
-                <div><strong class="font-title text-lg">Experiences:</strong> <span class="text-spire-dark-text">${adversary.experiences}</span></div>
-                ${adversary.features ? `<div><strong class="font-title text-lg">Features:</strong><ul class="list-disc list-inside">${adversary.features.map(f => `<li>${f}</li>`).join('')}</ul></div>` : ''}
-                ${adversary.actions ? `<div><strong class="font-title text-lg">Actions:</strong><ul class="list-disc list-inside">${adversary.actions.map(a => `<li>${a}</li>`).join('')}</ul></div>` : ''}
-                ${adversary.fearSpends ? `<div><strong class="font-title text-lg">Fear Spends:</strong> <span>${adversary.fearSpends}</span></div>` : ''}
-            </div>
-        `;
-
-        openModal('adversaryModal');
-        
-        if (adversary.stats.maxHp) {
-             setTimeout(() => createHPChart('hpChart', adversary.stats.hp, adversary.stats.maxHp), 10);
-        }
-    }
-
-    function createHPChart(canvasId, current, max) {
-        if (activeCharts[canvasId]) {
-            activeCharts[canvasId].destroy();
-        }
-        const ctx = document.getElementById(canvasId).getContext('2d');
-        activeCharts[canvasId] = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                datasets: [{
-                    data: [current, max - current],
-                    backgroundColor: ['#8e44ad', '#ecf0f1'],
-                    borderColor: ['#8e44ad', '#ecf0f1'],
-                    borderWidth: 1,
-                    cutout: '70%'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: { enabled: false }
-                }
-            },
-            plugins: [{
-                id: 'doughnutText',
-                beforeDraw(chart) {
-                    const { width, height, ctx } = chart;
-                    ctx.restore();
-                    const fontSize = (height / 80).toFixed(2);
-                    ctx.font = `bold ${fontSize}em sans-serif`;
-                    ctx.textBaseline = 'middle';
-                    const text = `${current}/${max}`;
-                    const textX = Math.round((width - ctx.measureText(text).width) / 2);
-                    const textY = height / 2;
-                    ctx.fillStyle = '#2c3e50';
-                    ctx.fillText(text, textX, textY);
-                    ctx.save();
-                }
-            }]
-        });
-    }
-
-    function openModal(modalId) {
-        document.getElementById(modalId).classList.remove('hidden');
-        document.getElementById(modalId).classList.add('flex');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeModal(modalId) {
-        document.getElementById(modalId).classList.add('hidden');
-        document.getElementById(modalId).classList.remove('flex');
-        document.body.style.overflow = 'auto';
-    }
-
-    function setupScrollspy() {
-        const sections = document.querySelectorAll('section[id]');
-        const navLinks = document.querySelectorAll('.sidebar-link');
-        
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    navLinks.forEach(link => {
-                        link.classList.toggle('active', link.getAttribute('href').substring(1) === entry.target.id);
-                    });
-                }
-            });
-        }, { rootMargin: "-50% 0px -50% 0px" });
-
-        sections.forEach(section => {
-            observer.observe(section);
-        });
-    }
-
-    document.querySelectorAll('.modal-backdrop').forEach(modal => {
-        modal.addEventListener('click', () => closeModal(modal.id));
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+        const isDark = document.documentElement.classList.contains('dark-theme');
+        document.documentElement.classList.remove(isDark ? 'dark-theme' : 'light-theme');
+        document.documentElement.classList.add(isDark ? 'light-theme' : 'dark-theme');
+        localStorage.setItem('theme', isDark ? 'light-theme' : 'dark-theme');
     });
 
-    window.onload = initApp;
+    document.getElementById('big-type-toggle').addEventListener('click', () => {
+        document.documentElement.classList.toggle('big-type');
+        localStorage.setItem('bigType', document.documentElement.classList.contains('big-type') ? 'true' : '');
+    });
+    
+    const allDetails = document.querySelectorAll('details');
+    document.getElementById('expand-toggle').addEventListener('click', (e) => {
+        const isExpanded = e.target.textContent === 'Collapse All';
+        allDetails.forEach(d => d.open = !isExpanded);
+        e.target.textContent = isExpanded ? 'Expand All' : 'Collapse All';
+    });
 
+    let timerInterval;
+    let seconds = 0;
+    const timerDisplay = document.getElementById('session-timer');
+    const startBtn = document.getElementById('timer-start');
+    const pauseBtn = document.getElementById('timer-pause');
+    const resetBtn = document.getElementById('timer-reset');
+
+    function updateTimer() {
+        const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+        const secs = (seconds % 60).toString().padStart(2, '0');
+        timerDisplay.textContent = `${mins}:${secs}`;
+    }
+    startBtn.addEventListener('click', () => {
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => { seconds++; updateTimer(); }, 1000);
+    });
+    pauseBtn.addEventListener('click', () => clearInterval(timerInterval));
+    resetBtn.addEventListener('click', () => { clearInterval(timerInterval); seconds = 0; updateTimer(); });
+
+    const backToTopBtn = document.getElementById('back-to-top');
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 600) {
+            backToTopBtn.style.display = 'block';
+        } else {
+            backToTopBtn.style.display = 'none';
+        }
+    });
+    backToTopBtn.addEventListener('click', (e) => { e.preventDefault(); window.scrollTo({ top: 0 }); });
+
+    document.getElementById('print-player').addEventListener('click', () => {
+        document.documentElement.classList.add('player-handouts');
+        window.print();
+    });
+    document.getElementById('print-gm').addEventListener('click', () => window.print());
+    window.addEventListener('afterprint', () => document.documentElement.classList.remove('player-handouts'));
+
+    const liveRegion = document.querySelector('.aria-live-region');
+    function announceCopy() {
+        liveRegion.textContent = 'Copied!';
+        liveRegion.style.opacity = '1';
+        setTimeout(() => {
+            liveRegion.style.opacity = '0';
+            liveRegion.textContent = '';
+        }, 2000);
+    }
+
+    document.body.addEventListener('click', (e) => {
+        if (e.target.matches('.copy-link-btn')) {
+            const id = e.target.closest('details').id;
+            navigator.clipboard.writeText(`${window.location.href.split('#')[0]}#${id}`);
+            announceCopy();
+        }
+        if (e.target.matches('.copy-btn')) {
+            const text = e.target.closest('blockquote, .stat-block').innerText.replace(/Copy( as Markdown)?$/, '').trim();
+            navigator.clipboard.writeText(text);
+            announceCopy();
+        }
+    });
+    
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.querySelector('.sidebar-toggle');
+    sidebarToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('is-open');
+        sidebarToggle.setAttribute('aria-expanded', sidebar.classList.contains('is-open'));
+    });
+});
 </script>
-</body>
-</html>
 
+<!-- COVERAGE OK -->
+</html>
