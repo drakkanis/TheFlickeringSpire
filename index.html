@@ -1,14 +1,15 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Flickering Spire - A Daggerheart Adventure</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Flickering Spire - A Daggerheart Adventure</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&amp;family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<style>
         html {
             scroll-behavior: smooth;
         }
@@ -74,157 +75,156 @@
         .table-row-link:hover {
             background-color: #1f2937;
         }
-    </style>
-</head>
+    
+
+/* --- Custom utility fixes for non-standard Tailwind classes --- */
+.text-ember-400 { color: #fbbf24 !important; }  /* amber-400-like */
+.text-ember-500 { color: #f59e0b !important; }  /* amber-500-like */
+.text-ember-600 { color: #d97706 !important; }  /* amber-600-like */
+.border-ember-800 { border-color: #7c4a1b !important; }
+.bg-ember-700 { background-color: #9a3412 !important; }
+.bg-ember-800 { background-color: #7c2d12 !important; }
+.hover\:bg-ember-800:hover { background-color: #7c2d12 !important; }
+/* Amethyst fallback for one-off class reference */
+.border-amethyst-900\/50 { border-color: rgba(88, 28, 135, 0.5) !important; }
+</style>
+<meta content="The Flickering Spire — a Daggerheart adventure: setting, beats, adversaries, rewards, and GM aids." name="description"/><link href="https://drakkanis.github.io/TheFlickeringSpire/" rel="canonical"/></head>
 <body class="bg-gray-900 text-gray-300">
-
-    <!-- Sidebar Navigation -->
-    <nav id="sidebar" class="hidden md:block fixed top-0 left-0 h-full w-64 bg-gray-900 border-r border-gray-700 p-5 z-20 overflow-y-auto" style="background-color: #0b1113; border-color: #273036;">
-        <h2 class="font-display text-2xl font-bold mb-6 text-ember-500 border-b border-ember-800 pb-2" style="color: #f0a44b; border-color: #7c4a1b;">Navigation</h2>
-        <ul class="space-y-2">
-            <li><a href="#welcome" class="sidebar-link block py-2 px-3 rounded transition-colors duration-200">Welcome</a></li>
-            <li><a href="#setting" class="sidebar-link block py-2 px-3 rounded transition-colors duration-200">The Setting</a></li>
-            <li><a href="#threat" class="sidebar-link block py-2 px-3 rounded transition-colors duration-200">The Threat</a></li>
-            <li><a href="#summary" class="sidebar-link block py-2 px-3 rounded transition-colors duration-200">Adventure Summary</a></li>
-            <li><a href="#hooks" class="sidebar-link block py-2 px-3 rounded transition-colors duration-200">Adventure Hooks</a></li>
-            <li><a href="#beats" class="sidebar-link block py-2 px-3 rounded transition-colors duration-200">Adventure Beats</a></li>
-            <li><a href="#conclusion" class="sidebar-link block py-2 px-3 rounded transition-colors duration-200">Concluding the Adventure</a></li>
-            <li><a href="#rewards" class="sidebar-link block py-2 px-3 rounded transition-colors duration-200">Rewards & Loot</a></li>
-        </ul>
-    </nav>
-
-    <!-- Main Content -->
-    <main id="main-content" class="md:ml-64 p-4 sm:p-6 md:p-10">
-        <header id="welcome" class="text-center mb-12 scroll-mt-20">
-            <h1 class="font-display text-5xl md:text-6xl font-bold text-ember-600 tracking-wider" style="color: #f0a44b;">The Flickering Spire</h1>
-            <div class="max-w-3xl mx-auto">
-                <p class="mt-4 text-lg text-gray-300">
+<!-- Sidebar Navigation -->
+<nav class="hidden md:block fixed top-0 left-0 h-full w-64 bg-gray-900 border-r border-gray-700 p-5 z-20 overflow-y-auto" id="sidebar" style="background-color: #0b1113; border-color: #273036;">
+<h2 class="font-display text-2xl font-bold mb-6 text-ember-500 border-b border-ember-800 pb-2" style="color: #f0a44b; border-color: #7c4a1b;">Navigation</h2>
+<ul class="space-y-2">
+<li><a class="sidebar-link block py-2 px-3 rounded transition-colors duration-200" href="#welcome">Welcome</a></li>
+<li><a class="sidebar-link block py-2 px-3 rounded transition-colors duration-200" href="#setting">The Setting</a></li>
+<li><a class="sidebar-link block py-2 px-3 rounded transition-colors duration-200" href="#threat">The Threat</a></li>
+<li><a class="sidebar-link block py-2 px-3 rounded transition-colors duration-200" href="#summary">Adventure Summary</a></li>
+<li><a class="sidebar-link block py-2 px-3 rounded transition-colors duration-200" href="#hooks">Adventure Hooks</a></li>
+<li><a class="sidebar-link block py-2 px-3 rounded transition-colors duration-200" href="#beats">Adventure Beats</a></li>
+<li><a class="sidebar-link block py-2 px-3 rounded transition-colors duration-200" href="#conclusion">Concluding the Adventure</a></li>
+<li><a class="sidebar-link block py-2 px-3 rounded transition-colors duration-200" href="#rewards">Rewards &amp; Loot</a></li>
+</ul>
+</nav>
+<!-- Main Content -->
+<main class="md:ml-64 p-4 sm:p-6 md:p-10" id="main-content">
+<header class="text-center mb-12 scroll-mt-20" id="welcome">
+<h1 class="font-display text-5xl md:text-6xl font-bold text-ember-600 tracking-wider" style="color: #f0a44b;">The Flickering Spire</h1>
+<div class="max-w-3xl mx-auto">
+<p class="mt-4 text-lg text-gray-300">
                     This adventure is designed to entertain you and your friends for hours with heroic deeds and harrowing perils. You, the Game Master (GM), will guide your friends as they explore the ancient Sablewood, banter with its strange denizens, and defeat vicious monsters with sword, spell, and Valor.
                 </p>
-            </div>
-             <img src="https://i.imgur.com/nlsd5iI.jpeg" alt="The Flickering Spire over the Sablewood" class="mt-8 mx-auto rounded-lg shadow-lg border-2 border-amethyst-900/50 w-full max-w-4xl" style="border-color: rgba(122, 92, 255, 0.5);">
-        </header>
-
-        <section id="setting" class="mb-12 p-6 bg-gray-800/50 rounded-lg border border-gray-700 scroll-mt-20" style="background-color: rgba(31, 41, 55, 0.5); border-color: #273036;">
-            <h2 class="font-display text-3xl font-bold mb-4 text-ember-500" style="color: #f0a44b;">The Setting</h2>
-            <p class="text-gray-300">The Sablewood is an ancient, expansive forest, older than memory, where the canopy is so thick that day and night are often indistinguishable. It is a land of vibrant life, home to unique hybrid fauna and reclusive communities. To maintain a fragile peace, great Spires of stone were erected, tended by solitary Keepers whose life force is tied to the magical flames they protect. These beacons ward the forest against a creeping, mindless blight and pacify the more monstrous creatures that lurk in the shadows.</p>
-        </section>
-
-        <section id="threat" class="mb-12 p-6 bg-gray-800/50 rounded-lg border border-gray-700 scroll-mt-20" style="background-color: rgba(31, 41, 55, 0.5); border-color: #273036;">
-            <h2 class="font-display text-3xl font-bold mb-4 text-ember-500" style="color: #f0a44b;">The Threat</h2>
-            <p class="text-gray-300">A subtle corruption has begun to seep into the Sablewood. It is a formless, insidious blight that preys on weakness and amplifies despair. It twists the natural life of the forest, turning creatures into pained, aggressive versions of themselves. This blight originates from a source of chaotic, uncontrolled magic, and it spreads through contact and proximity, threatening to unravel the ancient wards that have long protected the forest.</p>
-        </section>
-        
-        <section id="developments" class="mb-12 p-6 bg-gray-800/50 rounded-lg border border-gray-700 scroll-mt-20" style="background-color: rgba(31, 41, 55, 0.5); border-color: #273036;">
-            <h2 class="font-display text-3xl font-bold mb-4 text-ember-500" style="color: #f0a44b;">Recent Developments</h2>
-            <p class="text-gray-300">A powerful surge of raw, untamed magic recently washed through the Sablewood. The source was unknown to Elara, the keeper of the western Spire. Fearing the surge would overwhelm her Spire's wards, she attempted a dangerous attunement ritual. The power was too great. The ritual backfired, shattering her defenses and allowing the latent corruption to pour into her. She is no longer the Spire's guardian but its prisoner, a vessel for the very blight she sought to defy.</p>
-        </section>
-
-        <section id="summary" class="mb-12 p-6 bg-gray-800/50 rounded-lg border border-gray-700 scroll-mt-20" style="background-color: rgba(31, 41, 55, 0.5); border-color: #273036;">
-            <h2 class="font-display text-3xl font-bold mb-4 text-ember-500" style="color: #f0a44b;">Adventure Summary</h2>
-            <p class="text-gray-300">The adventure begins when the Whitefire Arcanist, concerned about a weakening Spire, tasks the PCs with investigating its failing flame. Their journey will take them along the Sablewood Path where they will encounter signs of the spreading corruption. They will discover the blighted hamlet of Ashen and learn of the Spirekeeper's fate before navigating the mystical Miremist to reach the Spire itself. After ascending the crumbling tower, they will face the corrupted Spirekeeper, Elara, with the choice to either cleanse her and the Spire or destroy the vessel she has become to stop the blight's spread.</p>
-        </section>
-
-        <section id="hooks" class="mb-12 scroll-mt-20">
-            <h2 class="font-display text-3xl font-bold mb-6 text-ember-500 text-center" style="color: #f0a44b;">Adventure Hooks</h2>
-            <div class="grid md:grid-cols-3 gap-6">
-                <div class="p-6 bg-gray-800/50 rounded-lg border border-gray-700" style="background-color: rgba(31, 41, 55, 0.5); border-color: #273036;">
-                    <h3 class="font-display text-xl font-bold text-ember-400 mb-2" style="color: #fbbf24;">1. The Underroot Connection</h3>
-                    <p>You grew up in an Underroot community and have a deep connection to the Sablewood's health. You've felt a "sickness" in the roots and heard whispers from your kin that the surface world is falling out of balance. The dimming of a Spire is a dire omen you feel compelled to investigate.</p>
-                </div>
-                <div class="p-6 bg-gray-800/50 rounded-lg border border-gray-700" style="background-color: rgba(31, 41, 55, 0.5); border-color: #273036;">
-                    <h3 class="font-display text-xl font-bold text-ember-400 mb-2" style="color: #fbbf24;">2. A Merchant's Debt</h3>
-                    <p>You are a member of, or have a significant debt to, the Sable Sinecure merchant's guild. The increasing aggression of the forest's hybrid fauna is making the well-worn pathways unsafe, disrupting trade. The guild has put out a bounty for anyone who can discover the source of the recent animal agitation and "pacify" it.</p>
-                </div>
-                <div class="p-6 bg-gray-800/50 rounded-lg border border-gray-700" style="background-color: rgba(31, 41, 55, 0.5); border-color: #273036;">
-                    <h3 class="font-display text-xl font-bold text-ember-400 mb-2" style="color: #fbbf24;">3. Spire-Sworn Lineage</h3>
-                    <p>One of your ancestors was a Spirekeeper. Though you never knew them, you carry a small, inert warding totem. For the past week, it has begun to feel warm and pulse with a faint, sickly light. You feel a pull towards the west, an instinctual call to answer a distress you don't yet understand.</p>
-                </div>
-            </div>
-        </section>
-        
-        <!-- Adventure Beats Section-->
-        <section id="beats" class="scroll-mt-20 mb-8">
-            <h2 class="font-display text-4xl font-bold mb-8 text-ember-500 text-center" style="color: #f0a44b;">Adventure Beats</h2>
-            <div class="space-y-8">
-                <!-- BEAT 1 -->
-                <details class="bg-gray-800/50 rounded-lg border border-gray-700 overflow-hidden" open style="background-color: rgba(31, 41, 55, 0.5); border-color: #273036;"><summary class="font-display text-3xl p-6 font-bold text-ember-500" style="color: #f0a44b;">Interlude 1: A Favour for a Friend</summary><div class="p-6 border-t border-gray-700 space-y-4" style="border-color: #273036;" id="interlude-1-a-favour-for-a-friend_content"></div></details>
-                <!-- BEAT 2 -->
-                <details class="bg-gray-800/50 rounded-lg border border-gray-700 overflow-hidden" style="background-color: rgba(31, 41, 55, 0.5); border-color: #273036;"><summary class="font-display text-3xl p-6 font-bold text-ember-500" style="color: #f0a44b;">Encounter 1: The Twisted Path</summary><div class="p-6 border-t border-gray-700 space-y-4" style="border-color: #273036;" id="encounter-1-the-twisted-path_content"></div></details>
-                <!-- BEAT 3 -->
-                <details class="bg-gray-800/50 rounded-lg border border-gray-700 overflow-hidden" style="background-color: rgba(31, 41, 55, 0.5); border-color: #273036;"><summary class="font-display text-3xl p-6 font-bold text-ember-500" style="color: #f0a44b;">Interlude 2: Hamlet of Ashen</summary><div class="p-6 border-t border-gray-700 space-y-4" style="border-color: #273036;" id="interlude-2-hamlet-of-ashen_content"></div></details>
-                <!-- INTERMISSION -->
-                <details class="bg-gray-800/50 rounded-lg border border-gray-700 overflow-hidden" open style="background-color: rgba(31, 41, 55, 0.5); border-color: #273036;"><summary class="font-display text-3xl p-6 font-bold text-ember-500" style="color: #f0a44b;">Encounter 2: Miremist Mystery</summary><div class="p-6 border-t border-gray-700 space-y-4" style="border-color: #273036;" id="encounter-2-miremist-mystery_content"></div></details>
-                <!-- BEAT 4 -->
-                <details class="bg-gray-800/50 rounded-lg border border-gray-700 overflow-hidden" style="background-color: rgba(31, 41, 55, 0.5); border-color: #273036;"><summary class="font-display text-3xl p-6 font-bold text-ember-500" style="color: #f0a44b;">Encounter 3: The Spiregrounds</summary><div class="p-6 border-t border-gray-700 space-y-4" style="border-color: #273036;" id="encounter-3-the-spiregrounds_content"></div></details>
-                <!-- BEAT 5 -->
-                <details class="bg-gray-800/50 rounded-lg border border-gray-700 overflow-hidden" style="background-color: rgba(31, 41, 55, 0.5); border-color: #273036;"><summary class="font-display text-3xl p-6 font-bold text-ember-500" style="color: #f0a44b;">Encounter 4: The Unsteady Climb</summary><div class="p-6 border-t border-gray-700 space-y-4" style="border-color: #273036;" id="encounter-4-the-unsteady-climb_content"></div></details>
-                <!-- BEAT 6 -->
-                <details class="bg-gray-800/50 rounded-lg border border-gray-700 overflow-hidden" style="background-color: rgba(31, 41, 55, 0.5); border-color: #273036;"><summary class="font-display text-3xl p-6 font-bold text-ember-500" style="color: #f0a44b;">Encounter 5: The Spirekeeper’s Plight</summary><div class="p-6 border-t border-gray-700 space-y-4" style="border-color: #273036;" id="encounter-5-the-spirekeepers-plight_content"></div></details>
-            </div>
-        </section>
-
-        <details id="conclusion" class="bg-gray-800/50 rounded-lg border border-gray-700 overflow-hidden mb-8 scroll-mt-20" style="background-color: rgba(31, 41, 55, 0.5); border-color: #273036;">
-            <summary class="font-display text-3xl p-6 font-bold text-ember-500" style="color: #f0a44b;">Concluding the Adventure</summary>
-            <div class="p-6 border-t border-gray-700 space-y-4" style="border-color: #273036;">
-                <p class="text-gray-300">With Elara either cleansed or laid to rest, the immediate threat to the western Sablewood has passed.</p>
-                <ul class="list-disc list-inside space-y-2 mt-4">
-                    <li><strong>If Elara was Cleansed:</strong> The Spire's flame roars back to life, a brilliant, steady beacon. The corruption in the immediate area recedes over the next few days. The villagers of Ashen slowly recover, and the forest's fauna returns to a less aggressive state. Elara, once she recovers, is immensely grateful and becomes a powerful ally to the party. She will confirm that the surge of magic felt overwhelming and unnatural, providing a hook for a future adventure to find its source.</li>
-                    <li><strong>If Elara was Destroyed:</strong> The flame is extinguished completely, and the Spire goes dark. The blighted ground around its base remains, a permanent scar on the landscape. While the party has stopped the immediate threat, the region is now vulnerable, and the corruption may one day return. The party has the gratitude of the people of Ashen, but a shadow of failure and loss hangs over their victory. This could lead to a future quest to find a new Spirekeeper or a way to relight the flame.</li>
-                </ul>
-                <p class="mt-4 text-gray-300">In either case, the party has earned a reputation as heroes in the Sablewood, and the Whitefire Arcanist will be keen to hear of their deeds and perhaps offer them a new, more dangerous task.</p>
-            </div>
-        </details>
-
-        <details id="rewards" class="bg-gray-800/50 rounded-lg border border-gray-700 overflow-hidden scroll-mt-20" style="background-color: rgba(31, 41, 55, 0.5); border-color: #273036;">
-            <summary class="font-display text-3xl p-6 font-bold text-ember-500" style="color: #f0a44b;">Rewards & Loot</summary>
-            <div class="p-6 border-t border-gray-700 space-y-4" style="border-color: #273036;">
-                <h3 class="font-display text-xl font-bold text-ember-400 mt-4" style="color: #fbbf24;">Loot</h3>
-                <ul class="list-disc list-inside space-y-1">
-                    <li><button class="text-ember-400 hover:underline" onclick="showModal('alistairsTorch')">Alistair’s Torch</button></li>
-                    <li><button class="text-ember-400 hover:underline" onclick="showModal('minorHealthPotionRecipe')">Minor Health Potion Recipe</button></li>
-                </ul>
-                <h3 class="font-display text-xl font-bold text-ember-400 mt-4" style="color: #fbbf24;">Consumables</h3>
-                <ul class="list-disc list-inside space-y-1">
-                    <li><button class="text-ember-400 hover:underline" onclick="showModal('sableSap')">Sable Sap</button></li>
-                    <li><button class="text-ember-400 hover:underline" onclick="showModal('snapPowder')">Snap Powder</button></li>
-                    <li><button class="text-ember-400 hover:underline" onclick="showModal('bugbaneBerry')">Bugbane Berry</button></li>
-                    <li><button class="text-ember-400 hover:underline" onclick="showModal('vialOfDarksmoke')">Vial of Darksmoke</button></li>
-                    <li><button class="text-ember-400 hover:underline" onclick="showModal('healthPotion')">Health Potion</button></li>
-                    <li><button class="text-ember-400 hover:underline" onclick="showModal('varikLeaves')">Varik Leaves</button></li>
-                    <li><button class="text-ember-400 hover:underline" onclick="showModal('attunePotion')">Attune Potion</button></li>
-                </ul>
-                <h3 class="font-display text-xl font-bold text-ember-400 mt-6" style="color: #fbbf24;">Special Reward: Fractured Spire Keystone</h3>
-                <p class="text-gray-300">A volatile magical item recovered from the final encounter. It pulses with a faint, chaotic energy. The shard must be stabilized via the Work on a Project downtime move.</p>
-                <p class="text-gray-300 mt-2">When complete, it transforms into one of the following:</p>
-                <ol class="list-decimal list-inside space-y-4 mt-4">
-                    <li>
-                        <p><strong>Warden's Aegis</strong></p>
-                        <p class="text-sm text-gray-400">Secondary Weapon (Tier 2 Shield)<br>Functions as an Improved Tower Shield.<br><strong>Trait:</strong> Strength | <strong>Range:</strong> Melee | <strong>Damage:</strong> d6+2 phy | <strong>Burden:</strong> One-Handed<br><strong>Feature: Barrier:</strong> +3 to Armor Score; -1 to Evasion<br><strong>Property: Intercession.</strong> Once per scene, when an ally within Close range is hit by an attack, use your reaction to reduce the damage they take by 2d8.</p>
-                    </li>
-                    <li>
-                        <p><strong>Heartfire Lantern</strong></p>
-                        <p class="text-sm text-gray-400">Item (Tier 2 Implement)<br><strong>Property: Rekindle.</strong> As an action, you can raise the lantern. You and all allies within Close range clear 2 Stress. Usable a number of times equal to your Proficiency per long rest.</p>
-                    </li>
-                    <li>
-                        <p><strong>Volatile Resonance Crystal</strong></p>
-                        <p class="text-sm text-gray-400">Item (Tier 2 Implement)<br><strong>Property: Unstable Overcharge.</strong> Once per session, overcharge a spell that deals magic damage to deal its maximum possible damage. After, roll a d6. On a 1, the crystal shatters, dealing 2d12 direct force damage to you.</p>
-                    </li>
-                </ol>
-            </div>
-        </details>
-
-    </main>
-
-    <!-- Modal -->
-    <div id="adversaryModal" class="modal-backdrop" onclick="closeModal()">
-        <div class="modal-content w-full max-w-2xl bg-gray-800 rounded-lg shadow-xl border border-gray-600 p-6" style="background-color:#12181b; border-color: #273036;" onclick="event.stopPropagation()">
-            <div id="modalContent"></div>
-            <button onclick="closeModal()" class="mt-6 w-full bg-ember-700 hover:bg-ember-800 text-white font-bold py-2 px-4 rounded transition-colors duration-200" style="background-color: #9a3412; color: #fff;">Close</button>
-        </div>
-    </div>
-
-    <script>
+</div>
+<img alt="The Flickering Spire over the Sablewood" class="mt-8 mx-auto rounded-lg shadow-lg border-2 border-amethyst-900/50 w-full max-w-4xl" decoding="async" fetchpriority="high" src="https://i.imgur.com/nlsd5iI.jpeg" style="border-color: rgba(122, 92, 255, 0.5);"/>
+</header>
+<section class="mb-12 p-6 bg-gray-800/50 rounded-lg border border-gray-700 scroll-mt-20" id="setting" style="background-color: rgba(31, 41, 55, 0.5); border-color: #273036;">
+<h2 class="font-display text-3xl font-bold mb-4 text-ember-500" style="color: #f0a44b;">The Setting</h2>
+<p class="text-gray-300">The Sablewood is an ancient, expansive forest, older than memory, where the canopy is so thick that day and night are often indistinguishable. It is a land of vibrant life, home to unique hybrid fauna and reclusive communities. To maintain a fragile peace, great Spires of stone were erected, tended by solitary Keepers whose life force is tied to the magical flames they protect. These beacons ward the forest against a creeping, mindless blight and pacify the more monstrous creatures that lurk in the shadows.</p>
+</section>
+<section class="mb-12 p-6 bg-gray-800/50 rounded-lg border border-gray-700 scroll-mt-20" id="threat" style="background-color: rgba(31, 41, 55, 0.5); border-color: #273036;">
+<h2 class="font-display text-3xl font-bold mb-4 text-ember-500" style="color: #f0a44b;">The Threat</h2>
+<p class="text-gray-300">A subtle corruption has begun to seep into the Sablewood. It is a formless, insidious blight that preys on weakness and amplifies despair. It twists the natural life of the forest, turning creatures into pained, aggressive versions of themselves. This blight originates from a source of chaotic, uncontrolled magic, and it spreads through contact and proximity, threatening to unravel the ancient wards that have long protected the forest.</p>
+</section>
+<section class="mb-12 p-6 bg-gray-800/50 rounded-lg border border-gray-700 scroll-mt-20" id="developments" style="background-color: rgba(31, 41, 55, 0.5); border-color: #273036;">
+<h2 class="font-display text-3xl font-bold mb-4 text-ember-500" style="color: #f0a44b;">Recent Developments</h2>
+<p class="text-gray-300">A powerful surge of raw, untamed magic recently washed through the Sablewood. The source was unknown to Elara, the keeper of the western Spire. Fearing the surge would overwhelm her Spire's wards, she attempted a dangerous attunement ritual. The power was too great. The ritual backfired, shattering her defenses and allowing the latent corruption to pour into her. She is no longer the Spire's guardian but its prisoner, a vessel for the very blight she sought to defy.</p>
+</section>
+<section class="mb-12 p-6 bg-gray-800/50 rounded-lg border border-gray-700 scroll-mt-20" id="summary" style="background-color: rgba(31, 41, 55, 0.5); border-color: #273036;">
+<h2 class="font-display text-3xl font-bold mb-4 text-ember-500" style="color: #f0a44b;">Adventure Summary</h2>
+<p class="text-gray-300">The adventure begins when the Whitefire Arcanist, concerned about a weakening Spire, tasks the PCs with investigating its failing flame. Their journey will take them along the Sablewood Path where they will encounter signs of the spreading corruption. They will discover the blighted hamlet of Ashen and learn of the Spirekeeper's fate before navigating the mystical Miremist to reach the Spire itself. After ascending the crumbling tower, they will face the corrupted Spirekeeper, Elara, with the choice to either cleanse her and the Spire or destroy the vessel she has become to stop the blight's spread.</p>
+</section>
+<section class="mb-12 scroll-mt-20" id="hooks">
+<h2 class="font-display text-3xl font-bold mb-6 text-ember-500 text-center" style="color: #f0a44b;">Adventure Hooks</h2>
+<div class="grid md:grid-cols-3 gap-6">
+<div class="p-6 bg-gray-800/50 rounded-lg border border-gray-700" style="background-color: rgba(31, 41, 55, 0.5); border-color: #273036;">
+<h3 class="font-display text-xl font-bold text-ember-400 mb-2" style="color: #fbbf24;">1. The Underroot Connection</h3>
+<p>You grew up in an Underroot community and have a deep connection to the Sablewood's health. You've felt a "sickness" in the roots and heard whispers from your kin that the surface world is falling out of balance. The dimming of a Spire is a dire omen you feel compelled to investigate.</p>
+</div>
+<div class="p-6 bg-gray-800/50 rounded-lg border border-gray-700" style="background-color: rgba(31, 41, 55, 0.5); border-color: #273036;">
+<h3 class="font-display text-xl font-bold text-ember-400 mb-2" style="color: #fbbf24;">2. A Merchant's Debt</h3>
+<p>You are a member of, or have a significant debt to, the Sable Sinecure merchant's guild. The increasing aggression of the forest's hybrid fauna is making the well-worn pathways unsafe, disrupting trade. The guild has put out a bounty for anyone who can discover the source of the recent animal agitation and "pacify" it.</p>
+</div>
+<div class="p-6 bg-gray-800/50 rounded-lg border border-gray-700" style="background-color: rgba(31, 41, 55, 0.5); border-color: #273036;">
+<h3 class="font-display text-xl font-bold text-ember-400 mb-2" style="color: #fbbf24;">3. Spire-Sworn Lineage</h3>
+<p>One of your ancestors was a Spirekeeper. Though you never knew them, you carry a small, inert warding totem. For the past week, it has begun to feel warm and pulse with a faint, sickly light. You feel a pull towards the west, an instinctual call to answer a distress you don't yet understand.</p>
+</div>
+</div>
+</section>
+<!-- Adventure Beats Section-->
+<section class="scroll-mt-20 mb-8" id="beats">
+<h2 class="font-display text-4xl font-bold mb-8 text-ember-500 text-center" style="color: #f0a44b;">Adventure Beats</h2>
+<div class="space-y-8">
+<!-- BEAT 1 -->
+<details class="bg-gray-800/50 rounded-lg border border-gray-700 overflow-hidden" open="" style="background-color: rgba(31, 41, 55, 0.5); border-color: #273036;"><summary class="font-display text-3xl p-6 font-bold text-ember-500" style="color: #f0a44b;">Interlude 1: A Favour for a Friend</summary><div class="p-6 border-t border-gray-700 space-y-4" id="interlude-1-a-favour-for-a-friend_content" style="border-color: #273036;"></div></details>
+<!-- BEAT 2 -->
+<details class="bg-gray-800/50 rounded-lg border border-gray-700 overflow-hidden" style="background-color: rgba(31, 41, 55, 0.5); border-color: #273036;"><summary class="font-display text-3xl p-6 font-bold text-ember-500" style="color: #f0a44b;">Encounter 1: The Twisted Path</summary><div class="p-6 border-t border-gray-700 space-y-4" id="encounter-1-the-twisted-path_content" style="border-color: #273036;"></div></details>
+<!-- BEAT 3 -->
+<details class="bg-gray-800/50 rounded-lg border border-gray-700 overflow-hidden" style="background-color: rgba(31, 41, 55, 0.5); border-color: #273036;"><summary class="font-display text-3xl p-6 font-bold text-ember-500" style="color: #f0a44b;">Interlude 2: Hamlet of Ashen</summary><div class="p-6 border-t border-gray-700 space-y-4" id="interlude-2-hamlet-of-ashen_content" style="border-color: #273036;"></div></details>
+<!-- INTERMISSION -->
+<details class="bg-gray-800/50 rounded-lg border border-gray-700 overflow-hidden" open="" style="background-color: rgba(31, 41, 55, 0.5); border-color: #273036;"><summary class="font-display text-3xl p-6 font-bold text-ember-500" style="color: #f0a44b;">Encounter 2: Miremist Mystery</summary><div class="p-6 border-t border-gray-700 space-y-4" id="encounter-2-miremist-mystery_content" style="border-color: #273036;"></div></details>
+<!-- BEAT 4 -->
+<details class="bg-gray-800/50 rounded-lg border border-gray-700 overflow-hidden" style="background-color: rgba(31, 41, 55, 0.5); border-color: #273036;"><summary class="font-display text-3xl p-6 font-bold text-ember-500" style="color: #f0a44b;">Encounter 3: The Spiregrounds</summary><div class="p-6 border-t border-gray-700 space-y-4" id="encounter-3-the-spiregrounds_content" style="border-color: #273036;"></div></details>
+<!-- BEAT 5 -->
+<details class="bg-gray-800/50 rounded-lg border border-gray-700 overflow-hidden" style="background-color: rgba(31, 41, 55, 0.5); border-color: #273036;"><summary class="font-display text-3xl p-6 font-bold text-ember-500" style="color: #f0a44b;">Encounter 4: The Unsteady Climb</summary><div class="p-6 border-t border-gray-700 space-y-4" id="encounter-4-the-unsteady-climb_content" style="border-color: #273036;"></div></details>
+<!-- BEAT 6 -->
+<details class="bg-gray-800/50 rounded-lg border border-gray-700 overflow-hidden" style="background-color: rgba(31, 41, 55, 0.5); border-color: #273036;"><summary class="font-display text-3xl p-6 font-bold text-ember-500" style="color: #f0a44b;">Encounter 5: The Spirekeeper’s Plight</summary><div class="p-6 border-t border-gray-700 space-y-4" id="encounter-5-the-spirekeepers-plight_content" style="border-color: #273036;"></div></details>
+</div>
+</section>
+<details class="bg-gray-800/50 rounded-lg border border-gray-700 overflow-hidden mb-8 scroll-mt-20" id="conclusion" style="background-color: rgba(31, 41, 55, 0.5); border-color: #273036;">
+<summary class="font-display text-3xl p-6 font-bold text-ember-500" style="color: #f0a44b;">Concluding the Adventure</summary>
+<div class="p-6 border-t border-gray-700 space-y-4" style="border-color: #273036;">
+<p class="text-gray-300">With Elara either cleansed or laid to rest, the immediate threat to the western Sablewood has passed.</p>
+<ul class="list-disc list-inside space-y-2 mt-4">
+<li><strong>If Elara was Cleansed:</strong> The Spire's flame roars back to life, a brilliant, steady beacon. The corruption in the immediate area recedes over the next few days. The villagers of Ashen slowly recover, and the forest's fauna returns to a less aggressive state. Elara, once she recovers, is immensely grateful and becomes a powerful ally to the party. She will confirm that the surge of magic felt overwhelming and unnatural, providing a hook for a future adventure to find its source.</li>
+<li><strong>If Elara was Destroyed:</strong> The flame is extinguished completely, and the Spire goes dark. The blighted ground around its base remains, a permanent scar on the landscape. While the party has stopped the immediate threat, the region is now vulnerable, and the corruption may one day return. The party has the gratitude of the people of Ashen, but a shadow of failure and loss hangs over their victory. This could lead to a future quest to find a new Spirekeeper or a way to relight the flame.</li>
+</ul>
+<p class="mt-4 text-gray-300">In either case, the party has earned a reputation as heroes in the Sablewood, and the Whitefire Arcanist will be keen to hear of their deeds and perhaps offer them a new, more dangerous task.</p>
+</div>
+</details>
+<details class="bg-gray-800/50 rounded-lg border border-gray-700 overflow-hidden scroll-mt-20" id="rewards" style="background-color: rgba(31, 41, 55, 0.5); border-color: #273036;">
+<summary class="font-display text-3xl p-6 font-bold text-ember-500" style="color: #f0a44b;">Rewards &amp; Loot</summary>
+<div class="p-6 border-t border-gray-700 space-y-4" style="border-color: #273036;">
+<h3 class="font-display text-xl font-bold text-ember-400 mt-4" style="color: #fbbf24;">Loot</h3>
+<ul class="list-disc list-inside space-y-1">
+<li><button class="text-ember-400 hover:underline" onclick="showModal('alistairsTorch')">Alistair’s Torch</button></li>
+<li><button class="text-ember-400 hover:underline" onclick="showModal('minorHealthPotionRecipe')">Minor Health Potion Recipe</button></li>
+</ul>
+<h3 class="font-display text-xl font-bold text-ember-400 mt-4" style="color: #fbbf24;">Consumables</h3>
+<ul class="list-disc list-inside space-y-1">
+<li><button class="text-ember-400 hover:underline" onclick="showModal('sableSap')">Sable Sap</button></li>
+<li><button class="text-ember-400 hover:underline" onclick="showModal('snapPowder')">Snap Powder</button></li>
+<li><button class="text-ember-400 hover:underline" onclick="showModal('bugbaneBerry')">Bugbane Berry</button></li>
+<li><button class="text-ember-400 hover:underline" onclick="showModal('vialOfDarksmoke')">Vial of Darksmoke</button></li>
+<li><button class="text-ember-400 hover:underline" onclick="showModal('healthPotion')">Health Potion</button></li>
+<li><button class="text-ember-400 hover:underline" onclick="showModal('varikLeaves')">Varik Leaves</button></li>
+<li><button class="text-ember-400 hover:underline" onclick="showModal('attunePotion')">Attune Potion</button></li>
+</ul>
+<h3 class="font-display text-xl font-bold text-ember-400 mt-6" style="color: #fbbf24;">Special Reward: Fractured Spire Keystone</h3>
+<p class="text-gray-300">A volatile magical item recovered from the final encounter. It pulses with a faint, chaotic energy. The shard must be stabilized via the Work on a Project downtime move.</p>
+<p class="text-gray-300 mt-2">When complete, it transforms into one of the following:</p>
+<ol class="list-decimal list-inside space-y-4 mt-4">
+<li>
+<p><strong>Warden's Aegis</strong></p>
+<p class="text-sm text-gray-400">Secondary Weapon (Tier 2 Shield)<br/>Functions as an Improved Tower Shield.<br/><strong>Trait:</strong> Strength | <strong>Range:</strong> Melee | <strong>Damage:</strong> d6+2 phy | <strong>Burden:</strong> One-Handed<br/><strong>Feature: Barrier:</strong> +3 to Armor Score; -1 to Evasion<br/><strong>Property: Intercession.</strong> Once per scene, when an ally within Close range is hit by an attack, use your reaction to reduce the damage they take by 2d8.</p>
+</li>
+<li>
+<p><strong>Heartfire Lantern</strong></p>
+<p class="text-sm text-gray-400">Item (Tier 2 Implement)<br/><strong>Property: Rekindle.</strong> As an action, you can raise the lantern. You and all allies within Close range clear 2 Stress. Usable a number of times equal to your Proficiency per long rest.</p>
+</li>
+<li>
+<p><strong>Volatile Resonance Crystal</strong></p>
+<p class="text-sm text-gray-400">Item (Tier 2 Implement)<br/><strong>Property: Unstable Overcharge.</strong> Once per session, overcharge a spell that deals magic damage to deal its maximum possible damage. After, roll a d6. On a 1, the crystal shatters, dealing 2d12 direct force damage to you.</p>
+</li>
+</ol>
+</div>
+</details>
+</main>
+<!-- Modal -->
+<div class="sr-only" id="adversaries">Adversaries</div><div aria-labelledby="modalTitle" aria-modal="true" class="modal-backdrop" id="adversaryModal" onclick="closeModal()" role="dialog">
+<div class="modal-content w-full max-w-2xl bg-gray-800 rounded-lg shadow-xl border border-gray-600 p-6" onclick="event.stopPropagation()" style="background-color:#12181b; border-color: #273036;">
+<div id="modalContent" tabindex="-1"><h2 class="sr-only" id="modalTitle">Detail</h2></div>
+<button class="mt-6 w-full bg-ember-700 hover:bg-ember-800 text-white font-bold py-2 px-4 rounded transition-colors duration-200" onclick="closeModal()" style="background-color: #9a3412; color: #fff;">Close</button>
+</div>
+</div>
+<script>
         const adversaryData = {
             willScild: { 
                 name: 'WILL SCILD', 
@@ -934,6 +934,26 @@
         window.showModal = showModal;
         window.closeModal = closeModal;
     </script>
-</body>
-</html>
+<script>
+(function(){
+  var modal = document.getElementById('adversaryModal');
+  var modalContent = document.getElementById('modalContent');
+  if(!modal || !modalContent) return;
 
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && modal.style.display === 'flex'){
+      if (typeof window.closeModal === 'function') window.closeModal();
+    }
+  });
+
+  // Focus the content when modal opens by observing style changes
+  var _show = window.showModal;
+  if (typeof _show === 'function') {
+    window.showModal = function(id){
+      _show(id);
+      try { modalContent.focus(); } catch(_e){}
+    };
+  }
+}());
+</script></body>
+</html>
